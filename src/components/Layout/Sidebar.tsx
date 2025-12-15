@@ -7,18 +7,23 @@ import {
   PenTool, 
   Activity, 
   ShoppingBag,
-  Hexagon
+  Hexagon,
+  BookOpen,
+  Settings
 } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar: React.FC = () => {
-  const navItems = [
+  const mainNavItems = [
     { path: '/insight', label: '洞察与诊断', icon: <BarChart2 size={20} /> },
     { path: '/intent', label: '定位搜索意图', icon: <Search size={20} /> },
-    { path: '/platform', label: '平台选择策略', icon: <Layers size={20} /> },
-    { path: '/content', label: '内容策略及创作', icon: <PenTool size={20} /> },
+    { path: '/content', label: '内容创作及发布', icon: <PenTool size={20} /> },
     { path: '/monitoring', label: '数据监测追踪', icon: <Activity size={20} /> },
     { path: '/conversion', label: '电商转化追踪', icon: <ShoppingBag size={20} /> },
+  ];
+
+  const settingNavItems = [
+    { path: '/knowledge', label: '知识库管理', icon: <BookOpen size={20} /> },
   ];
 
   return (
@@ -33,7 +38,24 @@ const Sidebar: React.FC = () => {
       
       <nav className="sidebar-nav">
         <ul>
-          {navItems.map((item) => (
+          {mainNavItems.map((item) => (
+            <li key={item.path}>
+              <NavLink 
+                to={item.path} 
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-8 mb-2 px-4">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">企业设置</p>
+        </div>
+        <ul>
+          {settingNavItems.map((item) => (
             <li key={item.path}>
               <NavLink 
                 to={item.path} 

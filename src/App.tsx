@@ -7,6 +7,7 @@ import PlatformStrategy from './pages/PlatformStrategy';
 import ContentStrategy from './pages/ContentStrategy';
 import DataMonitoring from './pages/DataMonitoring';
 import ConversionTracking from './pages/ConversionTracking';
+import KnowledgeBase from './pages/KnowledgeBase';
 
 const App: React.FC = () => {
   return (
@@ -16,8 +17,8 @@ const App: React.FC = () => {
           <Route index element={<Navigate to="/insight" replace />} />
           <Route path="insight" element={<InsightDiagnosis />} />
           <Route path="intent" element={<SearchIntent />} />
-          <Route path="platform" element={<PlatformStrategy />} />
           <Route path="content" element={<ContentStrategy />} />
+          <Route path="knowledge" element={<KnowledgeBase />} />
           <Route path="monitoring" element={<DataMonitoring />} />
           <Route path="conversion" element={<ConversionTracking />} />
         </Route>

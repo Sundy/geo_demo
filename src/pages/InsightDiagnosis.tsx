@@ -66,7 +66,7 @@ const InsightDiagnosis: React.FC = () => {
             '文心': { index: 54.2, mention: 4.2, top: 35.6, sentiment: 89.8 }
         };
 
-        if (platforms.length === 0) return { index: 0, mention: 0, top: 0, sentiment: 0 };
+        if (platforms.length === 0) return { brandIndex: 0, index: 0, mention: 0, top: 0, sentiment: 0 };
 
         // Calculate average
         let totalIndex = 0, totalMention = 0, totalTop = 0, totalSentiment = 0;
@@ -80,11 +80,25 @@ const InsightDiagnosis: React.FC = () => {
         });
 
         const count = platforms.length;
+        const avgIndex = totalIndex / count;
+        const avgMention = totalMention / count;
+        const avgTop = totalTop / count;
+        const avgSentiment = totalSentiment / count;
+
+        // Calculate Brand Index (Weighted Score)
+        // Formula: Index * 0.4 + Mention * 0.2 + Top * 0.2 + Sentiment * 0.2
+        // Note: Mention is typically low (e.g. 5%), so we normalize it by multiplying by 10 or similar? 
+        // Or just use the raw values if that's the business logic. 
+        // Let's assume a normalized calculation for demo:
+        // (Index + Top + Sentiment + Mention * 5) / 4 (Just a mock logic)
+        const brandIndex = (avgIndex * 0.4 + avgTop * 0.3 + avgSentiment * 0.3).toFixed(1);
+
         return {
-            index: (totalIndex / count).toFixed(1),
-            mention: (totalMention / count).toFixed(1),
-            top: (totalTop / count).toFixed(1),
-            sentiment: (totalSentiment / count).toFixed(1)
+            brandIndex,
+            index: avgIndex.toFixed(1),
+            mention: avgMention.toFixed(1),
+            top: avgTop.toFixed(1),
+            sentiment: avgSentiment.toFixed(1)
         };
     };
 
@@ -174,12 +188,28 @@ const InsightDiagnosis: React.FC = () => {
             </div>
 
             {/* Global Core Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                <div className="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl shadow-sm border border-red-100 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-sm text-gray-500 mb-1">AI品牌指数</p>
+                            <h3 className="text-3xl font-bold text-red-600">{metrics.brandIndex}</h3>
+                        </div>
+                        <div className="p-2 rounded-lg bg-red-100">
+                            <Sparkles className="w-6 h-6 text-red-600" />
+                        </div>
+                    </div>
+                    <div className="flex items-center text-sm">
+                        <span className="text-red-600 font-medium">综合评分</span>
+                        <span className="text-gray-400 ml-2">Weighted Score</span>
+                    </div>
+                </div>
+
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-4">
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">品牌GEO指数</p>
-                            <h3 className="text-3xl font-bold text-gray-800">{metrics.index}</h3>
+                            <p className="text-sm text-gray-500 mb-1">AI引用率</p>
+                            <h3 className="text-3xl font-bold text-gray-800">{metrics.index}<span className="text-lg text-gray-400 font-normal ml-1">%</span></h3>
                         </div>
                         <div className="p-2 rounded-lg bg-red-50">
                             <Activity className="w-6 h-6 text-red-600" />

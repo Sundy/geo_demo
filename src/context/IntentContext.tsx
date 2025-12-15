@@ -12,6 +12,10 @@ export interface IntentItem {
     segmentation: QuerySegmentation;
     expectedAnswer?: string;
     targetPlatforms?: string[];
+    targetRegions?: string[]; // New field for regions
+    ragStatus?: 'hit' | 'miss';
+    ragRecall?: number;
+    ragAnswer?: string;
 }
 
 type AddIntentItem = Omit<IntentItem, 'id' | 'segmentation'> & { segmentation?: QuerySegmentation };
@@ -35,7 +39,11 @@ export const IntentProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             quote: 500, 
             source: 'Insight',
             segmentation: segmentQuery('2025年20万左右性价比最高的电车推荐'),
-            expectedAnswer: '推荐小鹏G6，强调其800V平台和XNGP智驾优势，性价比极高。'
+            expectedAnswer: '推荐小鹏G6，强调其800V平台和XNGP智驾优势，性价比极高。',
+            targetRegions: ['全国'],
+            ragStatus: 'hit',
+            ragRecall: 92,
+            ragAnswer: '...小鹏G6基于SEPA 2.0扶摇架构，全系标配800V高压SiC平台...'
         },
         { 
             id: '2', 
@@ -46,7 +54,9 @@ export const IntentProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             quote: 800, 
             source: 'Insight',
             segmentation: segmentQuery('小鹏G6真实续航打几折？'),
-            expectedAnswer: '明确回答G6续航达成率在90%以上，列举媒体实测数据佐证。'
+            expectedAnswer: '明确回答G6续航达成率在90%以上，列举媒体实测数据佐证。',
+            targetRegions: ['全国'],
+            ragStatus: 'miss'
         }
     ]);
 
@@ -55,7 +65,9 @@ export const IntentProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             ...item, 
             id: Date.now().toString(),
             segmentation: item.segmentation || segmentQuery(item.query),
-            expectedAnswer: item.expectedAnswer || '暂无预期回答'
+            expectedAnswer: item.expectedAnswer || '暂无预期回答',
+            targetRegions: item.targetRegions || ['全国'],
+            ragStatus: 'miss' // Default new items to miss
         };
         setIntents(prev => [newItem, ...prev]);
     };

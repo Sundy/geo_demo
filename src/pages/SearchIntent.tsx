@@ -1,11 +1,94 @@
-import React, { useState } from 'react';
-import { Search, Plus, Trash2, TrendingUp, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Plus, Trash2, TrendingUp, MessageSquare, Database, Upload, CheckCircle, Zap, Bot, Sparkles, Moon, FileText } from 'lucide-react';
 import { useIntent } from '../context/IntentContext';
 import { segmentQuery } from '../utils/segmentation';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
+// Mock Platform Data with Prices
+const PLATFORMS = [
+    { id: 'Deepseek', name: 'DeepSeek', users: '1.2亿', price: 150, icon: Bot },
+    { id: 'Kimi', name: 'Kimi', users: '8000万', price: 120, icon: Moon },
+    { id: '豆包', name: '豆包', users: '2.5亿', price: 100, icon: Sparkles },
+    { id: '文心一言', name: '文心一言', users: '3.0亿', price: 180, icon: MessageSquare },
+    { id: '通义千问', name: '通义千问', users: '1.8亿', price: 140, icon: Zap },
+];
 
 const SearchIntent: React.FC = () => {
     const { intents, addIntent, removeIntent } = useIntent();
+    const reportRef = useRef<HTMLDivElement>(null);
     
+    // Platform Selection State
+    const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(PLATFORMS.map(p => p.id));
+    const [totalQuote, setTotalQuote] = useState(0);
+
+    // Calculate Total Quote
+    useEffect(() => {
+        const platformMultiplier = selectedPlatforms.reduce((sum, pid) => {
+            const p = PLATFORMS.find(platform => platform.id === pid);
+            return sum + (p?.price || 0);
+        }, 0);
+        
+        // Base calculation: (Base Intent Value + Platform Value) * Intent Count
+        // Simplified for demo: Sum of platform prices * Intent Count * 0.1 (discount factor)
+        const quote = intents.reduce((acc, item) => acc + item.quote, 0) + (platformMultiplier * intents.length * 0.5);
+        setTotalQuote(Math.floor(quote));
+    }, [selectedPlatforms, intents]);
+
+    const togglePlatform = (id: string) => {
+        setSelectedPlatforms(prev => 
+            prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+        );
+    };
+
+    const toggleAllPlatforms = () => {
+        if (selectedPlatforms.length === PLATFORMS.length) {
+            setSelectedPlatforms([]);
+        } else {
+            setSelectedPlatforms(PLATFORMS.map(p => p.id));
+        }
+    };
+
+    const handleDownloadPDF = async () => {
+        if (!reportRef.current) return;
+
+        try {
+            // Wait for render
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const canvas = await html2canvas(reportRef.current, {
+                scale: 2, // Higher resolution
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            
+            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+            const imgX = (pdfWidth - imgWidth * ratio) / 2;
+            const imgY = 20;
+
+            // Calculate height in PDF units
+            const imgProps = pdf.getImageProperties(imgData);
+            const finalPdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            // If height exceeds page, we might need multi-page logic, but for simple invoice we scale to fit or add pages
+            // For now, let's fit width and let height flow
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, finalPdfHeight);
+            pdf.save(`GEO_投放计划确认单_${new Date().toLocaleDateString()}.pdf`);
+        } catch (error) {
+            console.error('PDF Generation failed', error);
+            alert('PDF生成失败，请重试');
+        }
+    };
+
     // Form State
     const [newQuery, setNewQuery] = useState('');
     const [newCategory, setNewCategory] = useState('行业通用');
@@ -35,6 +118,51 @@ const SearchIntent: React.FC = () => {
                 <h1 className="text-3xl font-bold text-gray-800 mb-2">意图定位 (Intent Positioning)</h1>
                 <p className="text-gray-500">管理与优化核心搜索意图，智能拆解问题结构，并配置预期回答。</p>
             </header>
+
+            {/* Platform Selection Area */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-red-600" />
+                        目标平台选择与覆盖 (Platform Coverage)
+                    </h3>
+                    <div className="text-sm text-gray-500">
+                        已选平台总用户覆盖: <span className="font-bold text-gray-800">
+                            {selectedPlatforms.reduce((sum, pid) => {
+                                const p = PLATFORMS.find(pl => pl.id === pid);
+                                return sum + parseFloat(p?.users || '0');
+                            }, 0).toFixed(1)}亿+
+                        </span>
+                    </div>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                    <button
+                        onClick={toggleAllPlatforms}
+                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
+                            selectedPlatforms.length === PLATFORMS.length
+                            ? 'bg-red-600 text-white border-red-600 shadow-md shadow-red-100'
+                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                        }`}
+                    >
+                        全选平台
+                    </button>
+                    {PLATFORMS.map(platform => (
+                        <button
+                            key={platform.id}
+                            onClick={() => togglePlatform(platform.id)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
+                                selectedPlatforms.includes(platform.id)
+                                ? 'bg-red-50 text-red-700 border-red-200 shadow-sm'
+                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                            }`}
+                        >
+                            <platform.icon className={`w-4 h-4 ${selectedPlatforms.includes(platform.id) ? 'text-red-600' : 'text-gray-400'}`} />
+                            <span>{platform.name}</span>
+                            <span className="text-xs text-gray-400 ml-1">({platform.users})</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             {/* Manual Input Area */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
@@ -99,7 +227,7 @@ const SearchIntent: React.FC = () => {
             </div>
 
             {/* Intent List */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-24">
                  <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                         <Search className="w-5 h-5 text-gray-500" />
@@ -113,7 +241,10 @@ const SearchIntent: React.FC = () => {
                                 <th className="py-4 px-6 min-w-[240px]">核心问题 (Query)</th>
                                 <th className="py-4 px-6 min-w-[120px]">意图类别</th>
                                 <th className="py-4 px-6 min-w-[120px]">目标平台</th>
-                                <th className="py-4 px-6 min-w-[240px]">智能拆词 (Segmentation)</th>
+                                <th className="py-4 px-6 min-w-[240px]">知识库匹配 (KB Match)</th>
+                                <th className="py-4 px-6 min-w-[120px]">地域 (Region)</th>
+                                <th className="py-4 px-6 min-w-[240px]">核心意图词 (Core Keywords)</th>
+                                <th className="py-4 px-6 min-w-[240px]">长尾词示例 (Long-tail Examples)</th>
                                 <th className="py-4 px-6 min-w-[320px]">预期回答 (Expected Answer)</th>
                                 <th className="py-4 px-6 min-w-[120px]">热度/报价</th>
                                 <th className="py-4 px-6 text-right w-[80px]">操作</th>
@@ -152,27 +283,65 @@ const SearchIntent: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="py-4 px-6 align-top">
+                                        {item.ragStatus === 'hit' ? (
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                                                        <CheckCircle className="w-3 h-3" />
+                                                        已覆盖
+                                                    </span>
+                                                    <span className="text-xs text-gray-500 font-medium">
+                                                        召回率: <span className="text-green-600">{item.ragRecall}%</span>
+                                                    </span>
+                                                </div>
+                                                {item.ragAnswer && (
+                                                    <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded border border-gray-100 line-clamp-2" title={item.ragAnswer}>
+                                                        <Database className="w-3 h-3 inline mr-1 text-gray-400" />
+                                                        {item.ragAnswer}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col gap-2 items-start">
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">
+                                                    <Database className="w-3 h-3" />
+                                                    未收录
+                                                </span>
+                                                <button className="text-xs flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium hover:underline">
+                                                    <Upload className="w-3 h-3" />
+                                                    上传答案
+                                                </button>
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="py-4 px-6 align-top">
+                                        <div className="flex flex-wrap gap-1">
+                                            {item.targetRegions && item.targetRegions.length > 0 ? (
+                                                item.targetRegions.map(r => (
+                                                    <span key={r} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-xs rounded border border-blue-100">
+                                                        {r}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <span className="text-gray-400 text-xs">全国</span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6 align-top">
                                         <div className="flex flex-wrap gap-1.5">
-                                            {item.segmentation.coreIntent !== '未识别' && (
-                                                <span className="px-2 py-0.5 bg-red-50 text-red-600 text-xs rounded border border-red-100" title="核心意图">
-                                                    {item.segmentation.coreIntent}
-                                                </span>
-                                            )}
-                                            {item.segmentation.brand && (
-                                                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded border border-gray-200" title="品牌词">
-                                                    {item.segmentation.brand}
-                                                </span>
-                                            )}
-                                            {item.segmentation.region && (
-                                                <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded border border-blue-100" title="地域词">
-                                                    {item.segmentation.region}
-                                                </span>
-                                            )}
-                                            {item.segmentation.suffixes.map((s, idx) => (
-                                                <span key={idx} className="px-2 py-0.5 bg-yellow-50 text-yellow-600 text-xs rounded border border-yellow-100" title="后缀词">
-                                                    {s}
+                                            <span className="px-2 py-1 bg-red-50 text-red-700 text-sm font-medium rounded border border-red-100">
+                                                {item.segmentation.keywords}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6 align-top">
+                                        <div className="flex flex-col gap-1.5">
+                                            {item.segmentation.longTailExamples && item.segmentation.longTailExamples.map((ex, idx) => (
+                                                <span key={idx} className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 truncate max-w-[200px]" title={ex}>
+                                                    {ex}
                                                 </span>
                                             ))}
+                                            {!item.segmentation.longTailExamples && <span className="text-xs text-gray-400">-</span>}
                                         </div>
                                     </td>
                                     <td className="py-4 px-6 text-gray-600 text-sm align-top">
@@ -205,13 +374,146 @@ const SearchIntent: React.FC = () => {
                             ))}
                             {intents.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="py-12 text-center text-gray-400">
+                                    <td colSpan={10} className="py-12 text-center text-gray-400">
                                         暂无意图数据，请手动添加或从洞察页导入。
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            {/* Bottom Sticky Quote Bar */}
+            <div className="fixed bottom-0 left-64 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] p-4 flex justify-between items-center z-50">
+                <div className="flex items-center gap-6 px-4">
+                    <div>
+                        <p className="text-sm text-gray-500">已选平台</p>
+                        <div className="font-semibold text-gray-800 flex items-center gap-2">
+                            {selectedPlatforms.length > 0 ? `${selectedPlatforms.length} 个主流平台` : '未选择'}
+                            <span className="text-xs text-gray-400 font-normal">
+                                (覆盖 {selectedPlatforms.reduce((sum, pid) => {
+                                    const p = PLATFORMS.find(pl => pl.id === pid);
+                                    return sum + parseFloat(p?.users || '0');
+                                }, 0).toFixed(1)}亿用户)
+                            </span>
+                        </div>
+                    </div>
+                    <div className="h-8 w-px bg-gray-200"></div>
+                    <div>
+                        <p className="text-sm text-gray-500">优化意图数</p>
+                        <p className="font-semibold text-gray-800">{intents.length} 个核心词</p>
+                    </div>
+                </div>
+                
+                <div className="flex items-center gap-6 pr-8">
+                    <div className="text-right">
+                        <p className="text-sm text-gray-500">系统自动报价 (Estimated Quote)</p>
+                        <p className="text-2xl font-bold text-red-600">
+                            ¥{totalQuote.toLocaleString()}
+                        </p>
+                    </div>
+                    <button 
+                        onClick={handleDownloadPDF}
+                        className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-200 flex items-center gap-2"
+                    >
+                        <FileText className="w-5 h-5" />
+                        确认投放计划 (下载PDF)
+                    </button>
+                </div>
+            </div>
+
+            {/* Hidden Printable Report Area */}
+            <div style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}>
+                <div ref={reportRef} className="w-[800px] bg-white p-12 text-gray-800 font-sans">
+                    {/* Header */}
+                    <div className="flex justify-between items-start border-b-2 border-red-600 pb-6 mb-8">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">GEO 智能体投放计划确认单</h1>
+                            <p className="text-gray-500 text-sm">Generative Engine Optimization Plan</p>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-4xl font-bold text-red-600 mb-1">¥{totalQuote.toLocaleString()}</div>
+                            <p className="text-sm text-gray-500">预估总报价 (Total Quote)</p>
+                        </div>
+                    </div>
+
+                    {/* Meta Info */}
+                    <div className="grid grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <p className="text-xs text-gray-400 uppercase mb-1">客户信息 (Client)</p>
+                            <p className="font-bold text-lg">小鹏汽车 (XPeng Motors)</p>
+                            <p className="text-sm text-gray-600">日期: {new Date().toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs text-gray-400 uppercase mb-1">投放概览 (Overview)</p>
+                            <div className="flex gap-4">
+                                <div>
+                                    <span className="block text-xl font-bold">{intents.length}</span>
+                                    <span className="text-xs text-gray-500">优化关键词数</span>
+                                </div>
+                                <div>
+                                    <span className="block text-xl font-bold">{selectedPlatforms.length}</span>
+                                    <span className="text-xs text-gray-500">覆盖平台数</span>
+                                </div>
+                                <div>
+                                    <span className="block text-xl font-bold">
+                                        {selectedPlatforms.reduce((sum, pid) => {
+                                            const p = PLATFORMS.find(pl => pl.id === pid);
+                                            return sum + parseFloat(p?.users || '0');
+                                        }, 0).toFixed(1)}亿+
+                                    </span>
+                                    <span className="text-xs text-gray-500">预估覆盖用户</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Platforms */}
+                    <div className="mb-8">
+                        <h3 className="text-sm font-bold text-gray-900 uppercase border-b border-gray-200 pb-2 mb-4">已选投放平台 (Target Platforms)</h3>
+                        <div className="flex flex-wrap gap-3">
+                            {selectedPlatforms.map(pid => {
+                                const p = PLATFORMS.find(pl => pl.id === pid);
+                                return (
+                                    <span key={pid} className="px-3 py-1 bg-gray-100 rounded text-sm font-medium text-gray-700 border border-gray-200">
+                                        {p?.name}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Intents Table */}
+                    <div>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase border-b border-gray-200 pb-2 mb-4">优化意图列表 (Optimization Intents)</h3>
+                        <table className="w-full text-left text-xs">
+                            <thead className="bg-gray-50 text-gray-500">
+                                <tr>
+                                    <th className="p-3">核心问题 (Query)</th>
+                                    <th className="p-3">核心词 (Keywords)</th>
+                                    <th className="p-3">类别</th>
+                                    <th className="p-3 text-right">单价</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {intents.map((item, idx) => (
+                                    <tr key={idx}>
+                                        <td className="p-3 font-medium text-gray-800">{item.query}</td>
+                                        <td className="p-3 text-gray-600">{item.segmentation.keywords}</td>
+                                        <td className="p-3 text-gray-600">{item.category}</td>
+                                        <td className="p-3 text-right text-gray-800">¥{item.quote}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="mt-12 pt-6 border-t border-gray-200 text-center text-xs text-gray-400">
+                        <p>此报价单仅供参考，最终解释权归云智推 GEO 智能体系统所有。</p>
+                        <p>Generated by Trae AI • {new Date().toISOString()}</p>
+                    </div>
                 </div>
             </div>
         </div>
