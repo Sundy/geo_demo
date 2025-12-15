@@ -3,16 +3,22 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     Legend
 } from 'recharts';
-import { MapPin, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { MapPin, CheckCircle, XCircle, AlertCircle, Plus } from 'lucide-react';
+import { useIntent } from '../../context/IntentContext';
+import AddIntentModal from '../../components/AddIntentModal';
 
 interface InsightRegionProps {
     platform: string;
 }
 
 const InsightRegion: React.FC<InsightRegionProps> = ({ platform }) => {
+    const { addIntent } = useIntent();
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [currentQuery, setCurrentQuery] = React.useState('');
+
     // Mock data
     const presenceRate = platform === 'Deepseek' ? 78 : 65;
-
+    
     // 1. 地域前缀问题分析列表 (Regional Questions)
     const regionQuestions = [
         { 
@@ -56,6 +62,24 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform }) => {
             insight: '提及吉利系较多，但我方也有曝光'
         },
     ];
+
+    const handleAddToIntent = (query: string) => {
+        setCurrentQuery(query);
+        setIsModalOpen(true);
+    };
+
+    const handleConfirmIntent = (platforms: string[]) => {
+        addIntent({
+            query: currentQuery,
+            category: '地域相关',
+            prefixSuffix: '-',
+            heatIndex: 75, // Mock heat
+            quote: 450, // Mock quote
+            source: 'Insight',
+            targetPlatforms: platforms
+        });
+        // alert('已添加到意图定位列表！');
+    };
 
     // 2. 区域声量数据
     const regionData = [
@@ -120,7 +144,8 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform }) => {
                                 <th className="py-3 px-4">目标城市</th>
                                 <th className="py-3 px-4">品牌在场情况</th>
                                 <th className="py-3 px-4">主要竞品</th>
-                                <th className="py-3 px-4 rounded-r-lg">回答洞察</th>
+                                <th className="py-3 px-4">回答洞察</th>
+                                <th className="py-3 px-4 rounded-r-lg text-right">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -140,12 +165,28 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform }) => {
                                     </td>
                                     <td className="py-3 px-4 text-gray-600">{item.competitor}</td>
                                     <td className="py-3 px-4 text-gray-500 max-w-xs truncate" title={item.insight}>{item.insight}</td>
+                                    <td className="py-3 px-4 text-right">
+                                        <button 
+                                            onClick={() => handleAddToIntent(item.query)}
+                                            className="text-red-600 hover:text-red-800 p-1.5 hover:bg-red-100 rounded-full transition-colors"
+                                            title="添加到意图定位"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <AddIntentModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmIntent}
+                query={currentQuery}
+            />
         </div>
     );
 };

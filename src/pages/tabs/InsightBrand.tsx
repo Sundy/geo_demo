@@ -2,13 +2,19 @@ import React from 'react';
 import { 
     PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend 
 } from 'recharts';
-import { MessageSquare, ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle2, Plus } from 'lucide-react';
+import { useIntent } from '../../context/IntentContext';
+import AddIntentModal from '../../components/AddIntentModal';
 
 interface InsightBrandProps {
     platform: string;
 }
 
 const InsightBrand: React.FC<InsightBrandProps> = ({ platform }) => {
+    const { addIntent } = useIntent();
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [currentQuery, setCurrentQuery] = React.useState('');
+
     // Mock data
     const sentimentScore = platform === 'Deepseek' ? 92 : 85;
     
@@ -47,6 +53,24 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform }) => {
             risk: '环保材质质疑'
         },
     ];
+
+    const handleAddToIntent = (query: string) => {
+        setCurrentQuery(query);
+        setIsModalOpen(true);
+    };
+
+    const handleConfirmIntent = (platforms: string[]) => {
+        addIntent({
+            query: currentQuery,
+            category: '品牌专属',
+            prefixSuffix: '-',
+            heatIndex: 85, // Mock heat
+            quote: 600, // Mock quote
+            source: 'Insight',
+            targetPlatforms: platforms
+        });
+        // alert('已添加到意图定位列表！');
+    };
 
     // 2. 情绪分布
     const sentimentData = [
@@ -117,7 +141,8 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform }) => {
                                 <th className="py-3 px-4">AI回答情绪</th>
                                 <th className="py-3 px-4">健康得分</th>
                                 <th className="py-3 px-4">回答摘要</th>
-                                <th className="py-3 px-4 rounded-r-lg">风险提示</th>
+                                <th className="py-3 px-4">风险提示</th>
+                                <th className="py-3 px-4 rounded-r-lg text-right">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -147,12 +172,28 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform }) => {
                                             </span>
                                         )}
                                     </td>
+                                    <td className="py-3 px-4 text-right">
+                                        <button 
+                                            onClick={() => handleAddToIntent(item.query)}
+                                            className="text-red-600 hover:text-red-800 p-1.5 hover:bg-red-100 rounded-full transition-colors"
+                                            title="添加到意图定位"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <AddIntentModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmIntent}
+                query={currentQuery}
+            />
         </div>
     );
 };

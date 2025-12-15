@@ -2,13 +2,19 @@ import React from 'react';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell 
 } from 'recharts';
-import { Hash, Globe, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
+import { Hash, Globe, CheckCircle, XCircle, HelpCircle, Plus } from 'lucide-react';
+import { useIntent } from '../../context/IntentContext';
+import AddIntentModal from '../../components/AddIntentModal';
 
 interface InsightIndustryProps {
     platform: string;
 }
 
 const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform }) => {
+    const { addIntent } = useIntent();
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [currentQuery, setCurrentQuery] = React.useState('');
+
     // Mock data based on platform (simplified for demo)
     const leakageRate = platform === 'Deepseek' ? 68 : 55;
     
@@ -55,6 +61,24 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform }) => {
             context: '列举了G9, 理想MEGA, 智界S7' 
         },
     ];
+
+    const handleAddToIntent = (query: string) => {
+        setCurrentQuery(query);
+        setIsModalOpen(true);
+    };
+
+    const handleConfirmIntent = (platforms: string[]) => {
+        addIntent({
+            query: currentQuery,
+            category: '行业通用',
+            prefixSuffix: '-',
+            heatIndex: 80, // Mock heat
+            quote: 500, // Mock quote
+            source: 'Insight',
+            targetPlatforms: platforms
+        });
+        // alert('已添加到意图定位列表！');
+    };
 
     // 2. 品牌漏出率概览
     const overviewData = [
@@ -122,7 +146,8 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform }) => {
                                 <th className="py-3 px-4">是否漏出</th>
                                 <th className="py-3 px-4">我方排名</th>
                                 <th className="py-3 px-4">首位推荐品牌</th>
-                                <th className="py-3 px-4 rounded-r-lg">回答上下文简述</th>
+                                <th className="py-3 px-4">回答上下文简述</th>
+                                <th className="py-3 px-4 rounded-r-lg text-right">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -160,12 +185,28 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform }) => {
                                     <td className="py-3 px-4 text-gray-500 text-xs max-w-xs truncate" title={item.context}>
                                         {item.context}
                                     </td>
+                                    <td className="py-3 px-4 text-right">
+                                        <button 
+                                            onClick={() => handleAddToIntent(item.query)}
+                                            className="text-red-600 hover:text-red-800 p-1.5 hover:bg-red-100 rounded-full transition-colors"
+                                            title="添加到意图定位"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <AddIntentModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmIntent}
+                query={currentQuery}
+            />
         </div>
     );
 };

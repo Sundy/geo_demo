@@ -3,16 +3,22 @@ import {
     RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, 
     Tooltip, ResponsiveContainer 
 } from 'recharts';
-import { Swords, Trophy, XCircle, MinusCircle } from 'lucide-react';
+import { Swords, Trophy, XCircle, MinusCircle, Plus } from 'lucide-react';
+import { useIntent } from '../../context/IntentContext';
+import AddIntentModal from '../../components/AddIntentModal';
 
 interface InsightCompetitorProps {
     platform: string;
 }
 
 const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform }) => {
+    const { addIntent } = useIntent();
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [currentQuery, setCurrentQuery] = React.useState('');
+
     // Mock data
     const winRate = platform === 'Deepseek' ? 62 : 45;
-
+    
     // 1. 竞品对比问题列表 (Comparison Questions)
     const battleQuestions = [
         { 
@@ -44,6 +50,24 @@ const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform }) => {
             keyDiff: '性价比, 舆情'
         },
     ];
+
+    const handleAddToIntent = (query: string) => {
+        setCurrentQuery(query);
+        setIsModalOpen(true);
+    };
+
+    const handleConfirmIntent = (platforms: string[]) => {
+        addIntent({
+            query: currentQuery,
+            category: '竞品对比',
+            prefixSuffix: '-',
+            heatIndex: 90, // Mock heat
+            quote: 700, // Mock quote
+            source: 'Insight',
+            targetPlatforms: platforms
+        });
+        // alert('已添加到意图定位列表！');
+    };
 
     // 2. 竞争力雷达数据
     const radarData = [
@@ -107,7 +131,8 @@ const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform }) => {
                                 <th className="py-3 px-4">对标竞品</th>
                                 <th className="py-3 px-4">AI推荐倾向</th>
                                 <th className="py-3 px-4">胜出/惜败原因</th>
-                                <th className="py-3 px-4 rounded-r-lg">关键差异点</th>
+                                <th className="py-3 px-4">关键差异点</th>
+                                <th className="py-3 px-4 rounded-r-lg text-right">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -126,12 +151,28 @@ const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform }) => {
                                             {item.keyDiff}
                                         </span>
                                     </td>
+                                    <td className="py-3 px-4 text-right">
+                                        <button 
+                                            onClick={() => handleAddToIntent(item.query)}
+                                            className="text-red-600 hover:text-red-800 p-1.5 hover:bg-red-100 rounded-full transition-colors"
+                                            title="添加到意图定位"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <AddIntentModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmIntent}
+                query={currentQuery}
+            />
         </div>
     );
 };
