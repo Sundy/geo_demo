@@ -8,7 +8,7 @@ interface AddIntentModalProps {
     query: string;
 }
 
-const PLATFORMS = ['Deepseek', 'Kimi', '豆包', '文心一言', '通义千问'];
+const PLATFORMS = ['Deepseek', 'Kimi', '豆包', '文心一言', '千问'];
 
 const AddIntentModal: React.FC<AddIntentModalProps> = ({ isOpen, onClose, onConfirm, query }) => {
     const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);

@@ -100,7 +100,7 @@ const RECOMMENDED_SOURCES: Source[] = [
         name: '汽车之家 - 深度评测',
         type: '垂直媒体',
         matchScore: 98,
-        platforms: ['Deepseek', '通义千问'],
+        platforms: ['Deepseek', '千问'],
         price: '¥2,500/篇',
         reason: '完美匹配"汽车之家"高权重信源',
         tags: ['评测', '专业'],

@@ -40,7 +40,7 @@ const PlatformStrategy: React.FC = () => {
             ]
         },
         {
-            name: '通义千问',
+            name: '千问',
             logo: 'Q',
             color: '#624aff',
             focus: '核心信源类型',

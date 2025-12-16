@@ -31,7 +31,7 @@ const Sidebar: React.FC = () => {
       <div className="sidebar-header">
         <div className="logo">
           <Hexagon className="logo-icon" size={32} />
-          <span className="logo-text">云智推</span>
+          <span className="logo-text">AceFlow</span>
         </div>
         <p className="logo-subtitle">GEO 智能体系统</p>
       </div>

@@ -68,7 +68,7 @@ const INTENT_METRICS: IntentMetric[] = [
         impressionRate: '62%',
         growth: 8.2,
         aiSummary: '位于特斯拉Model Y之后，但被标注为"续航达成率最高"。',
-        platform: '通义千问',
+        platform: '千问',
         lastUpdated: '1小时前'
     },
     {
@@ -190,14 +190,14 @@ const DataMonitoring: React.FC = () => {
                                 </button>
 
                                 <button 
-                                    onClick={() => setSelectedPlatform('通义千问')}
+                                    onClick={() => setSelectedPlatform('千问')}
                                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all border whitespace-nowrap ${
-                                        selectedPlatform === '通义千问'
+                                        selectedPlatform === '千问'
                                         ? 'bg-red-50 text-red-600 border-red-200'
                                         : 'bg-white text-gray-600 border-transparent hover:bg-gray-50'
                                     }`}
                                 >
-                                    <Zap className="w-3.5 h-3.5" /> 通义千问
+                                    <Zap className="w-3.5 h-3.5" /> 千问
                                 </button>
 
                                 <button 

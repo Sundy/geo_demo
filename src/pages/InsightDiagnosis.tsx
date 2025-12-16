@@ -14,13 +14,13 @@ const InsightDiagnosis: React.FC = () => {
     const [selectedBrand, setSelectedBrand] = useState('小鹏');
     const [selectedProduct, setSelectedProduct] = useState('新能源车'); // Industry/Category
     const [timeRange, setTimeRange] = useState('近7天');
-    const [selectedModels, setSelectedModels] = useState<string[]>(['Deepseek', '豆包', '通义千问', 'Kimi', '文心']); // Default all
+    const [selectedModels, setSelectedModels] = useState<string[]>(['Deepseek', '豆包', '千问', 'Kimi', '文心']); // Default all
     
     // Model Definitions with Icons
     const models = [
         { id: 'Deepseek', name: 'DeepSeek', icon: Bot },
         { id: '豆包', name: '豆包', icon: Sparkles },
-        { id: '通义千问', name: '通义千问', icon: Zap },
+        { id: '千问', name: '千问', icon: Zap },
         { id: 'Kimi', name: 'Kimi', icon: Moon },
         { id: '文心', name: '文心', icon: MessageSquare },
     ];
@@ -61,7 +61,7 @@ const InsightDiagnosis: React.FC = () => {
         const platformData: Record<string, any> = {
             'Deepseek': { index: 58.4, mention: 4.8, top: 42.2, sentiment: 92.5 },
             '豆包': { index: 62.1, mention: 5.2, top: 45.0, sentiment: 94.0 },
-            '通义千问': { index: 55.8, mention: 4.5, top: 38.5, sentiment: 91.2 },
+            '千问': { index: 55.8, mention: 4.5, top: 38.5, sentiment: 91.2 },
             'Kimi': { index: 60.5, mention: 5.0, top: 43.8, sentiment: 93.5 },
             '文心': { index: 54.2, mention: 4.2, top: 35.6, sentiment: 89.8 }
         };
