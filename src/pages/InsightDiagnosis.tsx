@@ -8,6 +8,7 @@ import InsightIndustry from './tabs/InsightIndustry';
 import InsightBrand from './tabs/InsightBrand';
 import InsightCompetitor from './tabs/InsightCompetitor';
 import InsightRegion from './tabs/InsightRegion';
+import InsightCharts from '../components/InsightCharts';
 
 const InsightDiagnosis: React.FC = () => {
     // Filter States
@@ -275,6 +276,9 @@ const InsightDiagnosis: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Global Analysis Charts */}
+            <InsightCharts brandName={selectedBrand} />
 
             {/* Sequential Content */}
             <div className="space-y-8">
