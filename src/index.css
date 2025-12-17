@@ -10,6 +10,7 @@
   --glass-border: rgba(255, 75, 43, 0.1);
   --card-bg: rgba(255, 255, 255, 0.9);
   --sidebar-width: 260px;
+  --sidebar-collapsed-width: 88px;
   --header-height: 70px;
   --transition-speed: 0.3s;
   --primary-red: #ff4b2b;
