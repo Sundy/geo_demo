@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     BarChart, Bar, Cell,
-    PieChart, Pie
+    PieChart, Pie,
+    Treemap
 } from 'recharts';
 import { TrendingUp, BarChart2, PieChart as PieChartIcon, MessageSquare } from 'lucide-react';
 
@@ -91,6 +92,51 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
     ];
 
     const currentKeywords = activeKeywordTab === 'positive' ? positiveKeywords : negativeKeywords;
+
+    // 5. Source Distribution Data (Mock) - Treemap Format
+    const sourceData = [
+        { name: '百家号', value: 11.22, domain: 'baijiahao.baidu', color: '#34a853' },
+        { name: '搜狐网', value: 5.95, domain: 'sohu.com', color: '#f57c00' },
+        { name: '网易', value: 3.43, domain: '163.com', color: '#0277bd' },
+        { name: '搜狐WAP', value: 3.37, domain: 'm.sohu.com', color: '#ef4444' },
+        { name: '新浪财经', value: 3.09, domain: 'finance.sina', color: '#26a69a' },
+        { name: '微信公众号', value: 3.00, domain: 'mp.weixin.qq', color: '#9c27b0' },
+        { name: '今日头条', value: 2.61, domain: 'm.toutiao', color: '#ec407a' },
+        { name: '博客园', value: 2.04, domain: 'cnblogs', color: '#03a9f4' },
+        { name: '东方财富', value: 1.87, domain: 'pdf.dfcfw', color: '#ff5722' },
+        { name: '哔哩哔哩', value: 1.59, domain: 'bilibili', color: '#8bc34a' },
+    ];
+
+    // Custom Content for Treemap Node
+    const renderCustomizedContent = (props: any) => {
+        const { root, depth, x, y, width, height, index, name, value, domain, color } = props;
+
+        return (
+            <g>
+                <rect
+                    x={x}
+                    y={y}
+                    width={width}
+                    height={height}
+                    style={{
+                        fill: color,
+                        stroke: '#fff',
+                        strokeWidth: 2 / (depth + 1e-10),
+                        strokeOpacity: 1 / (depth + 1e-10),
+                    }}
+                />
+                {width > 50 && height > 50 && (
+                    <foreignObject x={x} y={y} width={width} height={height}>
+                        <div className="h-full w-full p-2 text-white overflow-hidden flex flex-col justify-start">
+                            <div className="font-bold text-sm truncate">{name}</div>
+                            <div className="text-xs opacity-80 truncate">{domain}</div>
+                            <div className="text-xs font-medium mt-1">{value}%</div>
+                        </div>
+                    </foreignObject>
+                )}
+            </g>
+        );
+    };
 
     return (
         <div className="space-y-6 mb-8">
@@ -227,55 +273,94 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
                 </div>
             </div>
 
-            {/* Row 3: Keywords Cloud (Unified & Refactored) */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                {/* Header with Toggle */}
-                <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                        <MessageSquare className="w-5 h-5 text-red-600" />
-                        行业情绪词 (Industry Sentiment Words)
-                    </h3>
-                    
-                    {/* Pill Toggle */}
-                    <div className="flex bg-white border border-gray-200 rounded-full p-1 shadow-sm w-full md:w-auto">
-                        <button
-                            onClick={() => setActiveKeywordTab('positive')}
-                            className={`flex-1 md:w-32 py-2 px-6 rounded-full text-sm font-medium transition-all duration-300 ${
-                                activeKeywordTab === 'positive'
-                                    ? 'bg-red-600 text-white shadow-md'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                        >
-                            正面关键词
-                        </button>
-                        <button
-                            onClick={() => setActiveKeywordTab('negative')}
-                            className={`flex-1 md:w-32 py-2 px-6 rounded-full text-sm font-medium transition-all duration-300 ${
-                                activeKeywordTab === 'negative'
-                                    ? 'bg-red-600 text-white shadow-md'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                        >
-                            负面关键词
-                        </button>
+            {/* Row 3: Keywords Cloud & Source Distribution */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Keywords Cloud (Unified & Refactored) */}
+                <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    {/* Header with Toggle */}
+                    <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+                        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <MessageSquare className="w-5 h-5 text-red-600" />
+                            行业情绪词 (Industry Sentiment Words)
+                        </h3>
+                        
+                        {/* Pill Toggle */}
+                        <div className="flex bg-white border border-gray-200 rounded-full p-1 shadow-sm w-full md:w-auto">
+                            <button
+                                onClick={() => setActiveKeywordTab('positive')}
+                                className={`flex-1 md:w-32 py-2 px-6 rounded-full text-sm font-medium transition-all duration-300 ${
+                                    activeKeywordTab === 'positive'
+                                        ? 'bg-red-600 text-white shadow-md'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                正面关键词
+                            </button>
+                            <button
+                                onClick={() => setActiveKeywordTab('negative')}
+                                className={`flex-1 md:w-32 py-2 px-6 rounded-full text-sm font-medium transition-all duration-300 ${
+                                    activeKeywordTab === 'negative'
+                                        ? 'bg-red-600 text-white shadow-md'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                负面关键词
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Word Cloud Container */}
+                    <div className="min-h-[300px] border border-gray-100 rounded-2xl p-8 flex flex-wrap justify-center items-center content-center gap-x-8 gap-y-4 bg-white">
+                        {currentKeywords.map((item, index) => (
+                            <span 
+                                key={index}
+                                className={`font-bold cursor-default transition-all duration-300 hover:scale-110 ${getRandomColor(index)}`}
+                                style={{ 
+                                    fontSize: Math.max(0.8, 1 + (item.count / 100) * 1.5) + 'rem',
+                                    opacity: 0.6 + (item.count / 100) * 0.4
+                                }}
+                                title={`${item.word}: ${item.count}`}
+                            >
+                                {item.word}
+                            </span>
+                        ))}
                     </div>
                 </div>
 
-                {/* Word Cloud Container */}
-                <div className="min-h-[300px] border border-gray-100 rounded-2xl p-8 flex flex-wrap justify-center items-center content-center gap-x-8 gap-y-4 bg-white">
-                    {currentKeywords.map((item, index) => (
-                        <span 
-                            key={index}
-                            className={`font-bold cursor-default transition-all duration-300 hover:scale-110 ${getRandomColor(index)}`}
-                            style={{ 
-                                fontSize: Math.max(0.8, 1 + (item.count / 100) * 1.5) + 'rem',
-                                opacity: 0.6 + (item.count / 100) * 0.4
-                            }}
-                            title={`${item.word}: ${item.count}`}
-                        >
-                            {item.word}
-                        </span>
-                    ))}
+                {/* Source Distribution */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                        <BarChart2 className="w-5 h-5 text-red-600" />
+                        信源分布 (Source Distribution)
+                    </h3>
+                    <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <Treemap
+                                data={sourceData}
+                                dataKey="value"
+                                aspectRatio={4 / 3}
+                                stroke="#fff"
+                                fill="#8884d8"
+                                content={renderCustomizedContent}
+                            >
+                                <Tooltip 
+                                    content={({ active, payload }) => {
+                                        if (active && payload && payload.length) {
+                                            const data = payload[0].payload;
+                                            return (
+                                                <div className="bg-white p-3 border border-gray-100 shadow-lg rounded-lg">
+                                                    <p className="font-bold text-gray-800">{data.name}</p>
+                                                    <p className="text-sm text-gray-500">{data.domain}</p>
+                                                    <p className="text-sm font-medium text-red-600 mt-1">{data.value}%</p>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    }}
+                                />
+                            </Treemap>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             </div>
         </div>
