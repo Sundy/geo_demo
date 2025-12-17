@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     BarChart, Bar, Cell,
@@ -11,6 +11,8 @@ interface InsightChartsProps {
 }
 
 const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) => {
+    // Keyword Toggle State
+    const [activeKeywordTab, setActiveKeywordTab] = useState<'positive' | 'negative'>('negative');
     
     // 1. AI Mention Trend Data (Mock)
     const trendData = [
@@ -41,6 +43,14 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
     ];
 
     // 4. Keywords Data (Mock)
+    // Enhanced with colors for cloud effect
+    const colors = [
+        'text-red-600', 'text-orange-500', 'text-blue-500', 'text-green-600', 
+        'text-purple-600', 'text-indigo-500', 'text-pink-500', 'text-teal-600'
+    ];
+
+    const getRandomColor = (index: number) => colors[index % colors.length];
+
     const positiveKeywords = [
         { word: '智驾领先', count: 88 },
         { word: '性价比高', count: 75 },
@@ -49,22 +59,45 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
         { word: '充电快', count: 45 },
         { word: '空间大', count: 40 },
         { word: 'OTA频繁', count: 35 },
+        { word: '语音交互流畅', count: 32 },
+        { word: '高速NGP好用', count: 28 },
+        { word: '自动泊车精准', count: 25 },
+        { word: '底盘调教舒适', count: 22 },
+        { word: '内饰用料实在', count: 18 },
+        { word: '能耗控制优秀', count: 15 },
+        { word: '外观时尚', count: 12 },
+        { word: '科技感强', count: 10 },
     ];
 
     const negativeKeywords = [
+        { word: '持续亏损', count: 95 },
+        { word: '盈利能力存疑', count: 85 },
+        { word: '市场竞争压力大', count: 80 },
+        { word: '价格战', count: 75 },
+        { word: '毛利率偏低', count: 70 },
+        { word: '现金流承压', count: 65 },
+        { word: '过度依赖价格战', count: 60 },
+        { word: '品牌认知度弱', count: 55 },
+        { word: '难以为继', count: 50 },
         { word: '内饰异味', count: 42 },
         { word: '隔音一般', count: 38 },
         { word: '售后网点少', count: 30 },
         { word: '底盘硬', count: 25 },
         { word: '车机偶尔卡顿', count: 20 },
+        { word: '保值率低', count: 18 },
+        { word: '营销力度不足', count: 15 },
+        { word: '交付周期长', count: 12 },
+        { word: '异响问题', count: 10 },
     ];
+
+    const currentKeywords = activeKeywordTab === 'positive' ? positiveKeywords : negativeKeywords;
 
     return (
         <div className="space-y-6 mb-8">
             {/* Section Header */}
             <div className="flex items-center gap-2 mb-4">
                 <div className="h-8 w-1 bg-red-600 rounded-full"></div>
-                <h2 className="text-xl font-bold text-gray-800">品牌提及率</h2>
+                <h2 className="text-xl font-bold text-gray-800">全域诊断概览 (Global Diagnosis Overview)</h2>
             </div>
 
             {/* Row 1: AI Mention Trend */}
@@ -123,7 +156,7 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
                         <BarChart2 className="w-5 h-5 text-red-600" />
-                        品牌提及率排名
+                        品牌提及率排名 (Brand Share of Voice)
                     </h3>
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -156,7 +189,7 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
                         <PieChartIcon className="w-5 h-5 text-red-600" />
-                        品牌情绪分布
+                        品牌情绪分布 (Sentiment Analysis)
                     </h3>
                     <div className="flex flex-col md:flex-row items-center h-[300px]">
                         <div className="w-full md:w-1/2 h-full">
@@ -194,50 +227,55 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
                 </div>
             </div>
 
-            {/* Row 3: Keywords Analysis */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Positive Keywords */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-                        <MessageSquare className="w-5 h-5 text-green-600" />
-                        正面关键词 (Positive Keywords)
+            {/* Row 3: Keywords Cloud (Unified & Refactored) */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                {/* Header with Toggle */}
+                <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5 text-red-600" />
+                        行业情绪词 (Industry Sentiment Words)
                     </h3>
-                    <div className="flex flex-wrap gap-3">
-                        {positiveKeywords.map((item, index) => (
-                            <span 
-                                key={index}
-                                className="px-4 py-2 bg-green-50 text-green-700 rounded-lg font-medium hover:bg-green-100 transition-colors cursor-default"
-                                style={{ 
-                                    fontSize: Math.max(0.8, 1 + (item.count / 100) * 0.5) + 'rem',
-                                    opacity: 0.6 + (item.count / 100) * 0.4
-                                }}
-                            >
-                                {item.word}
-                            </span>
-                        ))}
+                    
+                    {/* Pill Toggle */}
+                    <div className="flex bg-white border border-gray-200 rounded-full p-1 shadow-sm w-full md:w-auto">
+                        <button
+                            onClick={() => setActiveKeywordTab('positive')}
+                            className={`flex-1 md:w-32 py-2 px-6 rounded-full text-sm font-medium transition-all duration-300 ${
+                                activeKeywordTab === 'positive'
+                                    ? 'bg-red-600 text-white shadow-md'
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            正面关键词
+                        </button>
+                        <button
+                            onClick={() => setActiveKeywordTab('negative')}
+                            className={`flex-1 md:w-32 py-2 px-6 rounded-full text-sm font-medium transition-all duration-300 ${
+                                activeKeywordTab === 'negative'
+                                    ? 'bg-red-600 text-white shadow-md'
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            负面关键词
+                        </button>
                     </div>
                 </div>
 
-                {/* Negative Keywords */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-                        <MessageSquare className="w-5 h-5 text-red-600" />
-                        负面关键词 (Negative Keywords)
-                    </h3>
-                    <div className="flex flex-wrap gap-3">
-                        {negativeKeywords.map((item, index) => (
-                            <span 
-                                key={index}
-                                className="px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium hover:bg-red-100 transition-colors cursor-default"
-                                style={{ 
-                                    fontSize: Math.max(0.8, 1 + (item.count / 100) * 0.5) + 'rem',
-                                    opacity: 0.6 + (item.count / 100) * 0.4
-                                }}
-                            >
-                                {item.word}
-                            </span>
-                        ))}
-                    </div>
+                {/* Word Cloud Container */}
+                <div className="min-h-[300px] border border-gray-100 rounded-2xl p-8 flex flex-wrap justify-center items-center content-center gap-x-8 gap-y-4 bg-white">
+                    {currentKeywords.map((item, index) => (
+                        <span 
+                            key={index}
+                            className={`font-bold cursor-default transition-all duration-300 hover:scale-110 ${getRandomColor(index)}`}
+                            style={{ 
+                                fontSize: Math.max(0.8, 1 + (item.count / 100) * 1.5) + 'rem',
+                                opacity: 0.6 + (item.count / 100) * 0.4
+                            }}
+                            title={`${item.word}: ${item.count}`}
+                        >
+                            {item.word}
+                        </span>
+                    ))}
                 </div>
             </div>
         </div>

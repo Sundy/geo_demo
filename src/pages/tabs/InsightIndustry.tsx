@@ -8,9 +8,10 @@ import AddIntentModal from '../../components/AddIntentModal';
 
 interface InsightIndustryProps {
     platform: string;
+    onlyTable?: boolean;
 }
 
-const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform }) => {
+const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable = false }) => {
     const { addIntent } = useIntent();
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [currentQuery, setCurrentQuery] = React.useState('');
@@ -89,47 +90,49 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform }) => {
     return (
         <div className="space-y-6 fade-in">
             {/* 顶部概览卡片 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="glass-card p-6 flex flex-col justify-between bg-gradient-to-br from-red-50 to-white border-red-100">
-                    <div>
-                        <p className="text-gray-500 text-sm mb-1">当前平台</p>
-                        <h3 className="text-xl font-bold text-gray-800">{platform}</h3>
-                    </div>
-                    <div className="mt-4">
-                        <p className="text-gray-500 text-sm mb-1">行业问题品牌漏出率</p>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-bold text-red-600">{leakageRate}%</span>
-                            <span className="text-sm text-red-400">Visibility Rate</span>
+            {!onlyTable && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="glass-card p-6 flex flex-col justify-between bg-gradient-to-br from-red-50 to-white border-red-100">
+                        <div>
+                            <p className="text-gray-500 text-sm mb-1">当前平台</p>
+                            <h3 className="text-xl font-bold text-gray-800">{platform}</h3>
+                        </div>
+                        <div className="mt-4">
+                            <p className="text-gray-500 text-sm mb-1">行业问题品牌漏出率</p>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-4xl font-bold text-red-600">{leakageRate}%</span>
+                                <span className="text-sm text-red-400">Visibility Rate</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="md:col-span-2 glass-card p-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <Globe className="w-5 h-5 text-red-500" />
-                        行业大类问题品牌排名分布 (Rank Distribution)
-                    </h3>
-                    <div className="h-32 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart layout="vertical" data={[{ name: '排名分布', top1: 20, top3: 45, top10: 25, missed: 10 }]}>
-                                <XAxis type="number" hide />
-                                <YAxis type="category" dataKey="name" hide />
-                                <Tooltip cursor={{ fill: 'transparent' }} />
-                                <Bar dataKey="top1" name="排名 Top 1" stackId="a" fill="#ef4444" radius={[4, 0, 0, 4]} />
-                                <Bar dataKey="top3" name="排名 Top 3" stackId="a" fill="#f87171" />
-                                <Bar dataKey="top10" name="排名 Top 10" stackId="a" fill="#fca5a5" />
-                                <Bar dataKey="missed" name="未上榜" stackId="a" fill="#e5e7eb" radius={[0, 4, 4, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                        <div className="flex justify-between text-xs text-gray-500 mt-2 px-1">
-                            <span>Top 1 (20%)</span>
-                            <span>Top 3 (45%)</span>
-                            <span>Top 10 (25%)</span>
-                            <span>未上榜 (10%)</span>
+                    <div className="md:col-span-2 glass-card p-6">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <Globe className="w-5 h-5 text-red-500" />
+                            行业大类问题品牌排名分布 (Rank Distribution)
+                        </h3>
+                        <div className="h-32 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart layout="vertical" data={[{ name: '排名分布', top1: 20, top3: 45, top10: 25, missed: 10 }]}>
+                                    <XAxis type="number" hide />
+                                    <YAxis type="category" dataKey="name" hide />
+                                    <Tooltip cursor={{ fill: 'transparent' }} />
+                                    <Bar dataKey="top1" name="排名 Top 1" stackId="a" fill="#ef4444" radius={[4, 0, 0, 4]} />
+                                    <Bar dataKey="top3" name="排名 Top 3" stackId="a" fill="#f87171" />
+                                    <Bar dataKey="top10" name="排名 Top 10" stackId="a" fill="#fca5a5" />
+                                    <Bar dataKey="missed" name="未上榜" stackId="a" fill="#e5e7eb" radius={[0, 4, 4, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                            <div className="flex justify-between text-xs text-gray-500 mt-2 px-1">
+                                <span>Top 1 (20%)</span>
+                                <span>Top 3 (45%)</span>
+                                <span>Top 10 (25%)</span>
+                                <span>未上榜 (10%)</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* 行业问题详细列表 */}
             <div className="glass-card p-6">

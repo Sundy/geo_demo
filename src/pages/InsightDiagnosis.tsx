@@ -17,6 +17,9 @@ const InsightDiagnosis: React.FC = () => {
     const [timeRange, setTimeRange] = useState('近7天');
     const [selectedModels, setSelectedModels] = useState<string[]>(['Deepseek', '豆包', '千问', 'Kimi', '文心']); // Default all
     
+    // Tab State
+    const [activeTab, setActiveTab] = useState<'industry' | 'brand' | 'competitor' | 'region'>('industry');
+
     // Model Definitions with Icons
     const models = [
         { id: 'Deepseek', name: 'DeepSeek', icon: Bot },
@@ -280,47 +283,86 @@ const InsightDiagnosis: React.FC = () => {
             {/* Global Analysis Charts */}
             <InsightCharts brandName={selectedBrand} />
 
-            {/* Sequential Content */}
-            <div className="space-y-8">
-                {/* 1. Industry Section */}
-                <section>
-                    <SectionHeader 
-                        title="看行业 (Industry Analysis)" 
-                        icon={Globe} 
-                        description="行业通用问题渗透分析：识别大类词下的品牌漏出与排名机会。"
-                    />
-                    <InsightIndustry platform={platformDisplayString} />
-                </section>
+            {/* Tabbed Content: Brand Search Questions & Weights */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100">
+                    <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <MessageCircle className="w-6 h-6 text-red-600" />
+                        品牌搜索问题及权重 (Brand Search Questions & Weights)
+                    </h2>
+                    
+                    {/* Tab Navigation */}
+                    <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg w-fit">
+                        <button 
+                            onClick={() => setActiveTab('industry')}
+                            className={`
+                                flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
+                                ${activeTab === 'industry' 
+                                    ? 'bg-white text-red-600 shadow-sm' 
+                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                }
+                            `}
+                        >
+                            <Globe className="w-4 h-4" />
+                            看行业 (Industry)
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('brand')}
+                            className={`
+                                flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
+                                ${activeTab === 'brand' 
+                                    ? 'bg-white text-red-600 shadow-sm' 
+                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                }
+                            `}
+                        >
+                            <Layers className="w-4 h-4" />
+                            看品牌 (Brand)
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('competitor')}
+                            className={`
+                                flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
+                                ${activeTab === 'competitor' 
+                                    ? 'bg-white text-red-600 shadow-sm' 
+                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                }
+                            `}
+                        >
+                            <Target className="w-4 h-4" />
+                            看竞品 (Competitor)
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('region')}
+                            className={`
+                                flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
+                                ${activeTab === 'region' 
+                                    ? 'bg-white text-red-600 shadow-sm' 
+                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                }
+                            `}
+                        >
+                            <MapPin className="w-4 h-4" />
+                            看地域 (Region)
+                        </button>
+                    </div>
+                </div>
 
-                {/* 2. Brand Section */}
-                <section>
-                    <SectionHeader 
-                        title="看品牌 (Brand Health)" 
-                        icon={Layers} 
-                        description="品牌专属问题回答质量：监测AI对品牌核心痛点的回答情绪与准确性。"
-                    />
-                    <InsightBrand platform={platformDisplayString} />
-                </section>
-
-                {/* 3. Competitor Section */}
-                <section>
-                    <SectionHeader 
-                        title="看竞品 (Competitor Benchmarking)" 
-                        icon={Target} 
-                        description="对比类问题攻防分析：在直接竞品对比场景下，AI更倾向于推荐谁。"
-                    />
-                    <InsightCompetitor platform={platformDisplayString} />
-                </section>
-
-                {/* 4. Region Section */}
-                <section>
-                    <SectionHeader 
-                        title="看地域 (Regional Presence)" 
-                        icon={MapPin} 
-                        description="地域前缀问题渗透分析：不同城市与区域场景下的品牌曝光度。"
-                    />
-                    <InsightRegion platform={platformDisplayString} />
-                </section>
+                {/* Tab Content */}
+                <div className="p-6 bg-gray-50/50">
+                    {activeTab === 'industry' && (
+                        <InsightIndustry platform={platformDisplayString} onlyTable={true} />
+                    )}
+                    {activeTab === 'brand' && (
+                        <InsightBrand platform={platformDisplayString} onlyTable={true} />
+                    )}
+                    {activeTab === 'competitor' && (
+                        <InsightCompetitor platform={platformDisplayString} onlyTable={true} />
+                    )}
+                    {activeTab === 'region' && (
+                        <InsightRegion platform={platformDisplayString} onlyTable={true} />
+                    )}
+                </div>
             </div>
         </div>
     );

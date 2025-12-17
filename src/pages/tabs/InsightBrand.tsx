@@ -8,9 +8,10 @@ import AddIntentModal from '../../components/AddIntentModal';
 
 interface InsightBrandProps {
     platform: string;
+    onlyTable?: boolean;
 }
 
-const InsightBrand: React.FC<InsightBrandProps> = ({ platform }) => {
+const InsightBrand: React.FC<InsightBrandProps> = ({ platform, onlyTable = false }) => {
     const { addIntent } = useIntent();
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [currentQuery, setCurrentQuery] = React.useState('');
@@ -82,49 +83,51 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform }) => {
     return (
         <div className="space-y-6 fade-in">
              {/* 顶部概览 */}
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="glass-card p-6 flex flex-col justify-between bg-gradient-to-br from-red-50 to-white border-red-100">
-                    <div>
-                        <p className="text-gray-500 text-sm mb-1">当前平台</p>
-                        <h3 className="text-xl font-bold text-gray-800">{platform}</h3>
+             {!onlyTable && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="glass-card p-6 flex flex-col justify-between bg-gradient-to-br from-red-50 to-white border-red-100">
+                        <div>
+                            <p className="text-gray-500 text-sm mb-1">当前平台</p>
+                            <h3 className="text-xl font-bold text-gray-800">{platform}</h3>
+                        </div>
+                        <div className="mt-4">
+                            <p className="text-gray-500 text-sm mb-1">品牌回答健康度</p>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-4xl font-bold text-red-600">{sentimentScore}</span>
+                                <span className="text-sm text-red-400">Health Score</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="mt-4">
-                        <p className="text-gray-500 text-sm mb-1">品牌回答健康度</p>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-bold text-red-600">{sentimentScore}</span>
-                            <span className="text-sm text-red-400">Health Score</span>
+
+                    <div className="md:col-span-2 glass-card p-6">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <ThumbsUp className="w-5 h-5 text-red-500" />
+                            品牌问题情绪分布 (Sentiment Distribution)
+                        </h3>
+                        <div className="h-32 flex items-center">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={sentimentData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={40}
+                                        outerRadius={60}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {sentimentData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                    <Legend layout="vertical" verticalAlign="middle" align="right" />
+                                </PieChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
-
-                <div className="md:col-span-2 glass-card p-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <ThumbsUp className="w-5 h-5 text-red-500" />
-                        品牌问题情绪分布 (Sentiment Distribution)
-                    </h3>
-                    <div className="h-32 flex items-center">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={sentimentData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={40}
-                                    outerRadius={60}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {sentimentData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend layout="vertical" verticalAlign="middle" align="right" />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            </div>
+            )}
 
             {/* 品牌问题详细列表 */}
             <div className="glass-card p-6">

@@ -9,9 +9,10 @@ import AddIntentModal from '../../components/AddIntentModal';
 
 interface InsightCompetitorProps {
     platform: string;
+    onlyTable?: boolean;
 }
 
-const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform }) => {
+const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform, onlyTable = false }) => {
     const { addIntent } = useIntent();
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [currentQuery, setCurrentQuery] = React.useState('');
@@ -81,41 +82,43 @@ const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform }) => {
     return (
         <div className="space-y-6 fade-in">
             {/* 顶部概览 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="glass-card p-6 flex flex-col justify-between bg-gradient-to-br from-red-50 to-white border-red-100">
-                    <div>
-                        <p className="text-gray-500 text-sm mb-1">当前平台</p>
-                        <h3 className="text-xl font-bold text-gray-800">{platform}</h3>
+            {!onlyTable && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="glass-card p-6 flex flex-col justify-between bg-gradient-to-br from-red-50 to-white border-red-100">
+                        <div>
+                            <p className="text-gray-500 text-sm mb-1">当前平台</p>
+                            <h3 className="text-xl font-bold text-gray-800">{platform}</h3>
+                        </div>
+                        <div className="mt-4">
+                            <p className="text-gray-500 text-sm mb-1">对比问题胜出率</p>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-4xl font-bold text-red-600">{winRate}%</span>
+                                <span className="text-sm text-red-400">Win Rate</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="mt-4">
-                        <p className="text-gray-500 text-sm mb-1">对比问题胜出率</p>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-bold text-red-600">{winRate}%</span>
-                            <span className="text-sm text-red-400">Win Rate</span>
+
+                    <div className="md:col-span-2 glass-card p-6">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <Swords className="w-5 h-5 text-red-500" />
+                            核心竞争力对比雷达 (Radar Benchmark)
+                        </h3>
+                        <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+                                    <PolarGrid stroke="#e5e7eb" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 12 }} />
+                                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                                    <Radar name="我方品牌" dataKey="A" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} />
+                                    <Radar name="主要竞品" dataKey="B" stroke="#9ca3af" fill="#9ca3af" fillOpacity={0.4} />
+                                    <Legend />
+                                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none' }} />
+                                </RadarChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
-
-                <div className="md:col-span-2 glass-card p-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <Swords className="w-5 h-5 text-red-500" />
-                        核心竞争力对比雷达 (Radar Benchmark)
-                    </h3>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                                <PolarGrid stroke="#e5e7eb" />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 12 }} />
-                                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                <Radar name="我方品牌" dataKey="A" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} />
-                                <Radar name="主要竞品" dataKey="B" stroke="#9ca3af" fill="#9ca3af" fillOpacity={0.4} />
-                                <Legend />
-                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none' }} />
-                            </RadarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            </div>
+            )}
 
             {/* 攻防意图详细列表 */}
             <div className="glass-card p-6">
