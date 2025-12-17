@@ -157,29 +157,30 @@ const ContentStrategy: React.FC = () => {
     const [newPlanIntent, setNewPlanIntent] = useState('');
 
     const startNewPlan = () => {
-        setIsCreateModalOpen(true);
+        // Reset inputs
+        setNewPlanName('');
+        setNewPlanIntent('');
+        setCurrentPlan(null);
+        setStep(1);
+        setView('wizard');
     };
 
-    const confirmCreatePlan = () => {
+    const handleStep1Next = () => {
         const newPlan: CreationPlan = {
             id: Date.now(),
             name: newPlanName || '未命名计划',
             intent: newPlanIntent || '通用意图',
             status: 'draft',
-            progress: 0,
+            progress: 25,
             createdAt: new Date().toISOString().split('T')[0],
-            step: 2, // Jump to step 2 (Source Selection) as step 1 is Intent Selection in Modal
+            step: 2,
             selectedSources: [],
             articles: []
         };
         setCurrentPlan(newPlan);
         setSelectedSourceIds([]);
         setGeneratedArticles([]);
-        setStep(2); // Start at Source Selection
-        setView('wizard');
-        setIsCreateModalOpen(false);
-        setNewPlanName('');
-        setNewPlanIntent('');
+        setStep(2);
     };
 
     const continuePlan = (plan: CreationPlan) => {
@@ -242,6 +243,56 @@ const ContentStrategy: React.FC = () => {
     };
 
     // --- Renderers ---
+
+    const renderWizardStep1 = () => (
+        <div className="space-y-8 fade-in">
+             <div className="flex items-center gap-2 mb-4">
+                <PenTool className="text-red-600 w-5 h-5" />
+                <h3 className="font-bold text-gray-800 text-lg">Step 1: 定义创作意图 (Define Intent)</h3>
+            </div>
+
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 max-w-3xl">
+                <div className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">计划名称</label>
+                        <input 
+                            type="text" 
+                            placeholder="例如：2025春节电车长途评测" 
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all"
+                            value={newPlanName}
+                            onChange={e => setNewPlanName(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">核心意图 (Search Intent)</label>
+                        <div className="relative">
+                            <input 
+                                type="text" 
+                                placeholder="例如：20万左右性价比最高的电车推荐" 
+                                className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all"
+                                value={newPlanIntent}
+                                onChange={e => setNewPlanIntent(e.target.value)}
+                            />
+                            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                            <Bot className="w-3 h-3" /> 系统将基于核心意图自动分析高权重信源。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex justify-end pt-6 border-t border-gray-200">
+                <button 
+                    onClick={handleStep1Next}
+                    disabled={!newPlanName || !newPlanIntent}
+                    className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-200 disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
+                >
+                    下一步：选择信源 <ArrowRight className="w-4 h-4" />
+                </button>
+            </div>
+        </div>
+    );
 
     const renderDashboard = () => (
         <div className="space-y-8">
@@ -312,61 +363,6 @@ const ContentStrategy: React.FC = () => {
                     </tbody>
                 </table>
             </div>
-
-            {/* Create Plan Modal - Step 1: Intent Selection */}
-            {isCreateModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 fade-in">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                            <h3 className="font-bold text-gray-800 text-lg">Step 1: 新建创作计划</h3>
-                            <button onClick={() => setIsCreateModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">计划名称</label>
-                                <input 
-                                    type="text" 
-                                    placeholder="例如：2025春节电车长途评测" 
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-                                    value={newPlanName}
-                                    onChange={e => setNewPlanName(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">核心意图 (Search Intent)</label>
-                                <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        placeholder="例如：20万左右性价比最高的电车推荐" 
-                                        className="w-full px-4 py-2 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-                                        value={newPlanIntent}
-                                        onChange={e => setNewPlanIntent(e.target.value)}
-                                    />
-                                    <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-                                </div>
-                                <p className="text-xs text-gray-400 mt-2">系统将基于核心意图自动分析高权重信源。</p>
-                            </div>
-                        </div>
-                        <div className="px-6 py-4 bg-gray-50 flex justify-end gap-3">
-                            <button 
-                                onClick={() => setIsCreateModalOpen(false)}
-                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium"
-                            >
-                                取消
-                            </button>
-                            <button 
-                                onClick={confirmCreatePlan}
-                                disabled={!newPlanName || !newPlanIntent}
-                                className="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                            >
-                                下一步：选择信源 <ArrowRight className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 
@@ -623,9 +619,9 @@ const ContentStrategy: React.FC = () => {
                             <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
                                 <span onClick={() => setView('dashboard')} className="cursor-pointer hover:text-gray-800">创作计划</span>
                                 <ChevronRight className="w-4 h-4" />
-                                <span>{currentPlan?.name}</span>
+                                <span>{step === 1 ? '新建计划' : currentPlan?.name}</span>
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-800">{currentPlan?.intent}</h2>
+                            <h2 className="text-2xl font-bold text-gray-800">{step === 1 ? '定义创作意图' : currentPlan?.intent}</h2>
                         </div>
                         <div className="flex items-center gap-2">
                             {[1, 2, 3, 4].map(s => (
@@ -642,6 +638,7 @@ const ContentStrategy: React.FC = () => {
                     </div>
 
                     {/* Wizard Content */}
+                    {step === 1 && renderWizardStep1()}
                     {step === 2 && renderWizardStep2()}
                     {step === 3 && renderWizardStep3()}
                     {step === 4 && renderWizardStep4()}
