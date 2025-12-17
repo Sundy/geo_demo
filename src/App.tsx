@@ -8,6 +8,7 @@ import ContentStrategy from './pages/ContentStrategy';
 import DataMonitoring from './pages/DataMonitoring';
 import ConversionTracking from './pages/ConversionTracking';
 import KnowledgeBase from './pages/KnowledgeBase';
+import RealtimeSearch from './pages/RealtimeSearch';
 import WebsiteHome from './website/pages/Home';
 import Login from './pages/Login';
 
@@ -28,6 +29,7 @@ const App: React.FC = () => {
           <Route path="knowledge" element={<KnowledgeBase />} />
           <Route path="monitoring" element={<DataMonitoring />} />
           <Route path="conversion" element={<ConversionTracking />} />
+          <Route path="tools/realtime-search" element={<RealtimeSearch />} />
         </Route>
       </Routes>
     </Router>

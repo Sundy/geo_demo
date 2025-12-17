@@ -9,7 +9,8 @@ import {
   Hexagon,
   BookOpen,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Zap
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -40,6 +41,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     { path: '/knowledge', label: '知识库管理', icon: <BookOpen size={20} /> },
   ];
 
+  const toolNavItems = [
+    { path: '/tools/realtime-search', label: '实时查询', icon: <Zap size={20} /> },
+  ];
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -59,6 +64,24 @@ const Sidebar: React.FC<SidebarProps> = ({
         <nav className="sidebar-nav">
           <ul>
             {mainNavItems.map((item) => (
+              <li key={item.path}>
+                <NavLink 
+                  to={item.path} 
+                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  onClick={isMobile ? onCloseMobile : undefined}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-label">{item.label}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-8 mb-2 px-4 enterprise-label">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">工具</p>
+          </div>
+          <ul>
+            {toolNavItems.map((item) => (
               <li key={item.path}>
                 <NavLink 
                   to={item.path} 
