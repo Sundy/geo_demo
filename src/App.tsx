@@ -8,11 +8,16 @@ import ContentStrategy from './pages/ContentStrategy';
 import DataMonitoring from './pages/DataMonitoring';
 import ConversionTracking from './pages/ConversionTracking';
 import KnowledgeBase from './pages/KnowledgeBase';
+import WebsiteHome from './website/pages/Home';
 
 const App: React.FC = () => {
   return (
     <Router>
       <Routes>
+        {/* Official Website Route */}
+        <Route path="/website" element={<WebsiteHome />} />
+
+        {/* Dashboard Routes */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Navigate to="/insight" replace />} />
           <Route path="insight" element={<InsightDiagnosis />} />
