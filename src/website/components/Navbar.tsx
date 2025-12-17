@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Hexagon } from 'lucide-react';
 
 const Navbar: React.FC = () => {
+    const navigate = useNavigate();
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -27,10 +29,10 @@ const Navbar: React.FC = () => {
                     <a href="#cases" className="text-gray-700 hover:text-red-600 font-medium transition-colors">客户案例</a>
                 </div>
                 <button 
-                    onClick={() => window.location.href = '/insight'}
+                    onClick={() => navigate('/login')}
                     className="bg-red-600 text-white px-6 py-2 rounded-full font-medium hover:bg-red-700 transition-all hover:shadow-lg hover:shadow-red-200 transform hover:-translate-y-0.5"
                 >
-                    进入控制台
+                    登录
                 </button>
             </div>
         </nav>

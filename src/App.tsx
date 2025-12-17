@@ -9,6 +9,7 @@ import DataMonitoring from './pages/DataMonitoring';
 import ConversionTracking from './pages/ConversionTracking';
 import KnowledgeBase from './pages/KnowledgeBase';
 import WebsiteHome from './website/pages/Home';
+import Login from './pages/Login';
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
       <Routes>
         {/* Official Website Route */}
         <Route path="/website" element={<WebsiteHome />} />
+        <Route path="/login" element={<Login />} />
 
         {/* Dashboard Routes */}
         <Route path="/" element={<MainLayout />}>
