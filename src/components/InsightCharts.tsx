@@ -15,16 +15,37 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
     // Keyword Toggle State
     const [activeKeywordTab, setActiveKeywordTab] = useState<'positive' | 'negative'>('negative');
     
+    // Trend Time Filter State
+    const [trendTimeFilter, setTrendTimeFilter] = useState<'day' | 'week' | 'month'>('day');
+
     // 1. AI Mention Trend Data (Mock)
-    const trendData = [
-        { date: '12-10', brand: 12, industry: 8 },
-        { date: '12-11', brand: 15, industry: 9 },
-        { date: '12-12', brand: 18, industry: 11 },
-        { date: '12-13', brand: 14, industry: 10 },
-        { date: '12-14', brand: 22, industry: 12 },
-        { date: '12-15', brand: 25, industry: 14 },
-        { date: '12-16', brand: 28, industry: 13 },
-    ];
+    const trendDataMap = {
+        day: [
+            { date: '12-10', brand: 12, industry: 8 },
+            { date: '12-11', brand: 15, industry: 9 },
+            { date: '12-12', brand: 18, industry: 11 },
+            { date: '12-13', brand: 14, industry: 10 },
+            { date: '12-14', brand: 22, industry: 12 },
+            { date: '12-15', brand: 25, industry: 14 },
+            { date: '12-16', brand: 28, industry: 13 },
+        ],
+        week: [
+            { date: 'Week 46', brand: 45, industry: 30 },
+            { date: 'Week 47', brand: 52, industry: 35 },
+            { date: 'Week 48', brand: 48, industry: 38 },
+            { date: 'Week 49', brand: 60, industry: 42 },
+            { date: 'Week 50', brand: 65, industry: 40 },
+        ],
+        month: [
+            { date: '2024-08', brand: 180, industry: 120 },
+            { date: '2024-09', brand: 210, industry: 140 },
+            { date: '2024-10', brand: 195, industry: 150 },
+            { date: '2024-11', brand: 230, industry: 160 },
+            { date: '2024-12', brand: 250, industry: 170 },
+        ]
+    };
+
+    const currentTrendData = trendDataMap[trendTimeFilter];
 
     // 2. Brand Ranking Data (Mock)
     const rankingData = [
@@ -153,7 +174,27 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
                         <TrendingUp className="w-5 h-5 text-red-600" />
                         AI提及率趋势分析 (AI Mention Rate Trend)
                     </h3>
-                    <div className="flex gap-4 text-sm">
+                    <div className="flex gap-4 text-sm items-center">
+                        <div className="flex bg-gray-100 rounded-lg p-1">
+                            <button 
+                                onClick={() => setTrendTimeFilter('day')}
+                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'day' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                日
+                            </button>
+                            <button 
+                                onClick={() => setTrendTimeFilter('week')}
+                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'week' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                周
+                            </button>
+                            <button 
+                                onClick={() => setTrendTimeFilter('month')}
+                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'month' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                月
+                            </button>
+                        </div>
                         <div className="flex items-center gap-2">
                             <span className="w-3 h-3 rounded-full bg-red-600"></span>
                             <span className="text-gray-600">{brandName}</span>
@@ -166,7 +207,7 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
                 </div>
                 <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={trendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                        <LineChart data={currentTrendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                             <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
                             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} unit="%" />

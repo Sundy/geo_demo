@@ -27,28 +27,36 @@ const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform, onlyTab
             competitor: '特斯拉 Model Y',
             winner: '我方胜出', 
             reason: '智驾体验评价更高，性价比优势明显',
-            keyDiff: '智驾能力, 价格'
+            keyDiff: '智驾能力, 价格',
+            scenario: '决策中（对比竟品）',
+            focus: '综合对比'
         },
         { 
             query: '小鹏P7i vs 小米SU7 续航实测谁更强？', 
             competitor: '小米 SU7',
             winner: '竞品胜出', 
             reason: '小米流量热度高，回答侧重其生态优势',
-            keyDiff: '生态互联, 流量热度'
+            keyDiff: '生态互联, 流量热度',
+            scenario: '决策中（产品评估）',
+            focus: '续航性能'
         },
         { 
             query: '20万预算买小鹏G6还是极氪7X？', 
             competitor: '极氪 7X',
             winner: '势均力敌', 
             reason: '小鹏胜在智驾，极氪胜在内饰质感',
-            keyDiff: '智驾 vs 内饰'
+            keyDiff: '智驾 vs 内饰',
+            scenario: '决策中（对比竟品）',
+            focus: '选购建议'
         },
         { 
             query: '小鹏X9和理想MEGA怎么选？', 
             competitor: '理想 MEGA',
             winner: '我方胜出', 
             reason: '性价比高，且无负面舆情干扰',
-            keyDiff: '性价比, 舆情'
+            keyDiff: '性价比, 舆情',
+            scenario: '决策中（对比竟品）',
+            focus: '性价比'
         },
     ];
 
@@ -122,26 +130,34 @@ const InsightCompetitor: React.FC<InsightCompetitorProps> = ({ platform, onlyTab
 
             {/* 攻防意图详细列表 */}
             <div className="glass-card p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Swords className="w-5 h-5 text-red-500" />
-                    对比类问题攻防分析 (Comparison Query Analysis)
-                </h3>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-600">
+                    <table className="min-w-full text-left text-sm text-gray-600 whitespace-nowrap">
                         <thead className="bg-gray-50 text-gray-500 font-medium">
                             <tr>
-                                <th className="py-3 px-4 rounded-l-lg w-1/3">对比类问题 (Comparison Query)</th>
-                                <th className="py-3 px-4">对标竞品</th>
-                                <th className="py-3 px-4">AI推荐倾向</th>
-                                <th className="py-3 px-4">胜出/惜败原因</th>
-                                <th className="py-3 px-4">关键差异点</th>
-                                <th className="py-3 px-4 rounded-r-lg text-right">操作</th>
+                                <th className="py-3 px-4 rounded-l-lg min-w-[300px]">对比类问题 (Comparison Query)</th>
+                                <th className="py-3 px-4 min-w-[120px]">问题场景</th>
+                                <th className="py-3 px-4 min-w-[100px]">核心关注点</th>
+                                <th className="py-3 px-4 min-w-[120px]">对标竞品</th>
+                                <th className="py-3 px-4 min-w-[100px]">AI推荐倾向</th>
+                                <th className="py-3 px-4 min-w-[200px]">胜出/惜败原因</th>
+                                <th className="py-3 px-4 min-w-[150px]">关键差异点</th>
+                                <th className="py-3 px-4 rounded-r-lg text-right min-w-[80px]">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {battleQuestions.map((item, i) => (
                                 <tr key={i} className="hover:bg-red-50/50 transition-colors">
                                     <td className="py-3 px-4 font-medium text-gray-800">{item.query}</td>
+                                    <td className="py-3 px-4">
+                                        <span className={`px-2 py-1 rounded text-xs border ${
+                                            item.scenario.includes('决策前') ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                            item.scenario.includes('对比') ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                                            'bg-orange-50 text-orange-600 border-orange-100'
+                                        }`}>
+                                            {item.scenario}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-gray-700 font-medium">{item.focus}</td>
                                     <td className="py-3 px-4 text-gray-600">{item.competitor}</td>
                                     <td className="py-3 px-4">
                                         {item.winner === '我方胜出' && <span className="text-green-600 font-bold flex items-center gap-1"><Trophy className="w-4 h-4"/> 我方胜出</span>}

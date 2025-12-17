@@ -28,7 +28,9 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform, onlyTable = fal
             mentioned: true,
             status: 'Strong Presence',
             competitor: '特斯拉',
-            insight: '详细解读了政策，并推荐小鹏G6符合要求'
+            insight: '详细解读了政策，并推荐小鹏G6符合要求',
+            scenario: '决策前（了解产品）',
+            focus: '政策解读'
         },
         { 
             query: '北京冬天开电动车续航打折厉害吗？', 
@@ -36,7 +38,9 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform, onlyTable = fal
             mentioned: true,
             status: 'Weak Presence',
             competitor: '比亚迪',
-            insight: '主要提及比亚迪的抗低温表现，我方提及较少'
+            insight: '主要提及比亚迪的抗低温表现，我方提及较少',
+            scenario: '决策中（产品评估）',
+            focus: '续航表现'
         },
         { 
             query: '深圳购买小鹏G6有没有地补？', 
@@ -44,7 +48,9 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform, onlyTable = fal
             mentioned: true,
             status: 'Strong Presence',
             competitor: '-',
-            insight: '准确列出了深圳各区补贴金额'
+            insight: '准确列出了深圳各区补贴金额',
+            scenario: '决策中（产品评估）',
+            focus: '购车补贴'
         },
         { 
             query: '成都市区哪里有800V超充站？', 
@@ -52,7 +58,9 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform, onlyTable = fal
             mentioned: false,
             status: 'Missing',
             competitor: '极氪',
-            insight: '主要展示了极氪和特来电的充电地图'
+            insight: '主要展示了极氪和特来电的充电地图',
+            scenario: '决策中（产品评估）',
+            focus: '充电设施'
         },
         { 
             query: '杭州亚运会期间新能源限行规定', 
@@ -60,7 +68,9 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform, onlyTable = fal
             mentioned: true,
             status: 'Neutral',
             competitor: '吉利',
-            insight: '提及吉利系较多，但我方也有曝光'
+            insight: '提及吉利系较多，但我方也有曝光',
+            scenario: '决策前（了解产品）',
+            focus: '限行政策'
         },
     ];
 
@@ -135,26 +145,34 @@ const InsightRegion: React.FC<InsightRegionProps> = ({ platform, onlyTable = fal
 
             {/* 地域问题详细列表 */}
             <div className="glass-card p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-red-500" />
-                    地域前缀问题渗透分析 (Regional Query Analysis)
-                </h3>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-600">
+                    <table className="min-w-full text-left text-sm text-gray-600 whitespace-nowrap">
                         <thead className="bg-gray-50 text-gray-500 font-medium">
                             <tr>
-                                <th className="py-3 px-4 rounded-l-lg w-1/3">地域专属问题 (Regional Query)</th>
-                                <th className="py-3 px-4">目标城市</th>
-                                <th className="py-3 px-4">品牌在场情况</th>
-                                <th className="py-3 px-4">主要竞品</th>
-                                <th className="py-3 px-4">回答洞察</th>
-                                <th className="py-3 px-4 rounded-r-lg text-right">操作</th>
+                                <th className="py-3 px-4 rounded-l-lg min-w-[300px]">地域专属问题 (Regional Query)</th>
+                                <th className="py-3 px-4 min-w-[120px]">问题场景</th>
+                                <th className="py-3 px-4 min-w-[100px]">核心关注点</th>
+                                <th className="py-3 px-4 min-w-[100px]">目标城市</th>
+                                <th className="py-3 px-4 min-w-[120px]">品牌在场情况</th>
+                                <th className="py-3 px-4 min-w-[100px]">主要竞品</th>
+                                <th className="py-3 px-4 min-w-[200px]">回答洞察</th>
+                                <th className="py-3 px-4 rounded-r-lg text-right min-w-[80px]">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {regionQuestions.map((item, i) => (
                                 <tr key={i} className="hover:bg-red-50/50 transition-colors">
                                     <td className="py-3 px-4 font-medium text-gray-800">{item.query}</td>
+                                    <td className="py-3 px-4">
+                                        <span className={`px-2 py-1 rounded text-xs border ${
+                                            item.scenario.includes('决策前') ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                            item.scenario.includes('对比') ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                                            'bg-orange-50 text-orange-600 border-orange-100'
+                                        }`}>
+                                            {item.scenario}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-gray-700 font-medium">{item.focus}</td>
                                     <td className="py-3 px-4">
                                         <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
                                             {item.city}

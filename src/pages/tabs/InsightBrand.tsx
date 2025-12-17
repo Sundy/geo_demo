@@ -27,7 +27,8 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform, onlyTable = false
             sentiment: 'Positive', 
             score: 95,
             summary: '普遍反馈续航扎实，达成率90%以上',
-            risk: '无明显风险'
+            risk: '无明显风险',
+            scenario: '决策中（产品评估）'
         },
         { 
             query: '小鹏的售后服务态度好不好？', 
@@ -35,7 +36,8 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform, onlyTable = false
             sentiment: 'Mixed', 
             score: 60,
             summary: '一线城市评价较好，部分二线城市反馈网点少',
-            risk: '网点覆盖不足'
+            risk: '网点覆盖不足',
+            scenario: '决策中（产品评估）'
         },
         { 
             query: 'XNGP智驾系统在暴雨天能用吗？', 
@@ -43,7 +45,8 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform, onlyTable = false
             sentiment: 'Positive', 
             score: 98,
             summary: '极端天气表现稳定，安全冗余机制获好评',
-            risk: '无明显风险'
+            risk: '无明显风险',
+            scenario: '决策中（产品评估）'
         },
         { 
             query: '小鹏G9内饰有没有异味？', 
@@ -51,7 +54,8 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform, onlyTable = false
             sentiment: 'Negative', 
             score: 40,
             summary: '部分早期车主反馈有轻微异味',
-            risk: '环保材质质疑'
+            risk: '环保材质质疑',
+            scenario: '决策中（产品评估）'
         },
     ];
 
@@ -131,27 +135,33 @@ const InsightBrand: React.FC<InsightBrandProps> = ({ platform, onlyTable = false
 
             {/* 品牌问题详细列表 */}
             <div className="glass-card p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-red-500" />
-                    品牌专属问题回答质量 (Brand Query Analysis)
-                </h3>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-600">
+                    <table className="min-w-full text-left text-sm text-gray-600 whitespace-nowrap">
                         <thead className="bg-gray-50 text-gray-500 font-medium">
                             <tr>
-                                <th className="py-3 px-4 rounded-l-lg w-1/3">品牌专属问题 (Brand Query)</th>
-                                <th className="py-3 px-4">关注点</th>
-                                <th className="py-3 px-4">AI回答情绪</th>
-                                <th className="py-3 px-4">健康得分</th>
-                                <th className="py-3 px-4">回答摘要</th>
-                                <th className="py-3 px-4">风险提示</th>
-                                <th className="py-3 px-4 rounded-r-lg text-right">操作</th>
+                                <th className="py-3 px-4 rounded-l-lg min-w-[300px]">品牌专属问题 (Brand Query)</th>
+                                <th className="py-3 px-4 min-w-[120px]">问题场景</th>
+                                <th className="py-3 px-4 min-w-[100px]">核心关注点</th>
+                                <th className="py-3 px-4 min-w-[100px]">AI回答情绪</th>
+                                <th className="py-3 px-4 min-w-[80px]">健康得分</th>
+                                <th className="py-3 px-4 min-w-[200px]">回答摘要</th>
+                                <th className="py-3 px-4 min-w-[120px]">风险提示</th>
+                                <th className="py-3 px-4 rounded-r-lg text-right min-w-[80px]">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {brandQuestions.map((item, i) => (
                                 <tr key={i} className="hover:bg-red-50/50 transition-colors">
                                     <td className="py-3 px-4 font-medium text-gray-800">{item.query}</td>
+                                    <td className="py-3 px-4">
+                                        <span className={`px-2 py-1 rounded text-xs border ${
+                                            item.scenario.includes('决策前') ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                            item.scenario.includes('对比') ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                                            'bg-orange-50 text-orange-600 border-orange-100'
+                                        }`}>
+                                            {item.scenario}
+                                        </span>
+                                    </td>
                                     <td className="py-3 px-4">
                                         <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
                                             {item.focus}

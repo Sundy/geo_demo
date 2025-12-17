@@ -27,7 +27,9 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable =
             mentioned: true, 
             rank: 2, 
             topBrand: '特斯拉 (Model Y)',
-            context: '列举了Model Y, 小鹏G6, 极氪7X' 
+            context: '列举了Model Y, 小鹏G6, 极氪7X',
+            scenario: '决策中（对比竟品）',
+            focus: '性价比'
         },
         { 
             query: '2025年最值得买的新能源轿车排行榜', 
@@ -35,7 +37,9 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable =
             mentioned: true, 
             rank: 4, 
             topBrand: '比亚迪 (汉)',
-            context: '主要推荐了比亚迪汉, 小米SU7, 极氪001' 
+            context: '主要推荐了比亚迪汉, 小米SU7, 极氪001',
+            scenario: '决策前（了解产品）',
+            focus: '综合排名'
         },
         { 
             query: '适合家用的智能驾驶汽车有哪些？', 
@@ -43,7 +47,9 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable =
             mentioned: true, 
             rank: 1, 
             topBrand: '小鹏 (G6/G9)',
-            context: '重点推荐了小鹏XNGP, 华为系' 
+            context: '重点推荐了小鹏XNGP, 华为系',
+            scenario: '决策前（了解产品）',
+            focus: '智能驾驶'
         },
         { 
             query: '续航最扎实的电动车排名', 
@@ -51,7 +57,9 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable =
             mentioned: false, 
             rank: '-', 
             topBrand: '极氪 (001)',
-            context: '未提及我方品牌' 
+            context: '未提及我方品牌',
+            scenario: '决策中（产品评估）',
+            focus: '续航里程'
         },
         { 
             query: '800V高压快充车型盘点', 
@@ -59,7 +67,9 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable =
             mentioned: true, 
             rank: 3, 
             topBrand: '小鹏 (G9)',
-            context: '列举了G9, 理想MEGA, 智界S7' 
+            context: '列举了G9, 理想MEGA, 智界S7',
+            scenario: '决策中（产品评估）',
+            focus: '充电速度'
         },
     ];
 
@@ -136,21 +146,19 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable =
 
             {/* 行业问题详细列表 */}
             <div className="glass-card p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Hash className="w-5 h-5 text-red-500" />
-                    行业通用问题渗透分析 (Industry Question Analysis)
-                </h3>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-gray-600">
+                    <table className="min-w-full text-left text-sm text-gray-600 whitespace-nowrap">
                         <thead className="bg-gray-50 text-gray-500 font-medium">
                             <tr>
-                                <th className="py-3 px-4 rounded-l-lg w-1/3">行业通用问题 (Industry Query)</th>
-                                <th className="py-3 px-4">搜索热度</th>
-                                <th className="py-3 px-4">是否漏出</th>
-                                <th className="py-3 px-4">我方排名</th>
-                                <th className="py-3 px-4">首位推荐品牌</th>
-                                <th className="py-3 px-4">回答上下文简述</th>
-                                <th className="py-3 px-4 rounded-r-lg text-right">操作</th>
+                                <th className="py-3 px-4 rounded-l-lg min-w-[300px]">行业通用问题 (Industry Query)</th>
+                                <th className="py-3 px-4 min-w-[120px]">问题场景</th>
+                                <th className="py-3 px-4 min-w-[100px]">核心关注点</th>
+                                <th className="py-3 px-4 min-w-[100px]">搜索热度</th>
+                                <th className="py-3 px-4 min-w-[100px]">是否漏出</th>
+                                <th className="py-3 px-4 min-w-[80px]">我方排名</th>
+                                <th className="py-3 px-4 min-w-[150px]">首位推荐品牌</th>
+                                <th className="py-3 px-4 min-w-[200px]">回答上下文简述</th>
+                                <th className="py-3 px-4 rounded-r-lg text-right min-w-[80px]">操作</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -160,6 +168,16 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable =
                                         <HelpCircle className="w-4 h-4 text-gray-300" />
                                         {item.query}
                                     </td>
+                                    <td className="py-3 px-4">
+                                        <span className={`px-2 py-1 rounded text-xs border ${
+                                            item.scenario.includes('决策前') ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                            item.scenario.includes('对比') ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                                            'bg-orange-50 text-orange-600 border-orange-100'
+                                        }`}>
+                                            {item.scenario}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-gray-700 font-medium">{item.focus}</td>
                                     <td className="py-3 px-4">
                                         <span className={`px-2 py-1 rounded-full text-xs ${
                                             item.volume === 'Very High' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
@@ -182,7 +200,7 @@ const InsightIndustry: React.FC<InsightIndustryProps> = ({ platform, onlyTable =
                                         item.rank === 1 ? 'text-red-600 text-lg' : 
                                         item.rank !== '-' ? 'text-gray-800' : 'text-gray-300'
                                     }`}>
-                                        {item.rank === 1 ? 'NO.1' : item.rank}
+                                        {item.rank === 1 ? '1' : item.rank}
                                     </td>
                                     <td className="py-3 px-4 text-gray-700">{item.topBrand}</td>
                                     <td className="py-3 px-4 text-gray-500 text-xs max-w-xs truncate" title={item.context}>
