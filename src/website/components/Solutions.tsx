@@ -30,7 +30,7 @@ const Solutions: React.FC = () => {
         },
         {
             icon: <Database className="w-8 h-8 text-purple-500" />,
-            title: "6. 知识库管理",
+            title: "6. 向量知识库",
             desc: "构建品牌专属知识库，提升 AI 理解准确度，掌握品牌解释权。"
         }
     ];

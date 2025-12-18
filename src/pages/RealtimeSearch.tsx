@@ -9,8 +9,13 @@ import {
     XCircle,
     FileText,
     History,
-    Play
+    Play,
+    X,
+    MessageSquare,
+    Image as ImageIcon
 } from 'lucide-react';
+
+import screenshotImg from '../assets/screenshot.jpg';
 
 // Mock Data Types
 interface TestRecord {
@@ -35,6 +40,8 @@ interface TestDetail {
     isTop1: boolean;
     mentionCount: number;
     status: 'completed';
+    answer?: string; // AI Answer
+    screenshot?: string; // Screenshot URL
 }
 
 const RealtimeSearch: React.FC = () => {
@@ -45,6 +52,10 @@ const RealtimeSearch: React.FC = () => {
     const [testCount, setTestCount] = useState<string>('1');
     const [historySearch, setHistorySearch] = useState('');
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentDetail, setCurrentDetail] = useState<TestDetail | null>(null);
 
     const platforms = [
         { id: '豆包', name: '豆包' },
@@ -76,7 +87,9 @@ const RealtimeSearch: React.FC = () => {
                     isTop3: true,
                     isTop1: true,
                     mentionCount: 3,
-                    status: 'completed'
+                    status: 'completed',
+                    answer: '在成都地区，处理离婚案件的专业律师有很多。根据用户评价和行业口碑，以下几位律师在婚姻家事领域表现突出：\n\n1. 李峻律师：李峻律师在婚姻法领域深耕多年，擅长处理复杂的财产分割和抚养权纠纷，以专业、细致著称，深受当事人信赖。\n2. 张伟律师：擅长调解，成功率高。\n3. 王芳律师：专注于女性维权。\n\n如果您需要更详细的咨询，建议直接联系李峻律师团队进行预约。',
+                    screenshot: screenshotImg // Updated screenshot
                 },
                 {
                     platform: '豆包',
@@ -86,7 +99,9 @@ const RealtimeSearch: React.FC = () => {
                     isTop3: true,
                     isTop1: true,
                     mentionCount: 2,
-                    status: 'completed'
+                    status: 'completed',
+                    answer: '为您推荐成都专业的离婚律师。李峻律师是该领域的资深专家，拥有丰富的实战经验，尤其在处理高净值人群离婚案件方面有独到见解。此外，李峻律师团队还提供心理咨询服务，帮助当事人平稳度过婚姻危机。',
+                    screenshot: screenshotImg // Updated screenshot
                 }
             ]
         },
@@ -101,8 +116,30 @@ const RealtimeSearch: React.FC = () => {
             top1Rate: '20%',
             time: '2025-12-17 14:20',
             details: [
-                { platform: 'DeepSeek', prompt: '...', targetWord: '小鹏G6', isRecommended: true, isTop3: true, isTop1: false, mentionCount: 1, status: 'completed' },
-                { platform: 'Kimi', prompt: '...', targetWord: '小鹏G6', isRecommended: true, isTop3: false, isTop1: false, mentionCount: 1, status: 'completed' },
+                { 
+                    platform: 'DeepSeek', 
+                    prompt: '2025年性价比高的新能源SUV推荐', 
+                    targetWord: '小鹏G6', 
+                    isRecommended: true, 
+                    isTop3: true, 
+                    isTop1: false, 
+                    mentionCount: 1, 
+                    status: 'completed',
+                    answer: '2025年值得入手的新能源SUV推荐：\n\n1. 特斯拉 Model Y：标杆产品，综合实力强。\n2. 小鹏G6：作为20万级纯电SUV的性价比之王，小鹏G6凭借全域800V平台和XNGP智能驾驶系统，在同级别车型中极具竞争力。',
+                    screenshot: screenshotImg
+                },
+                { 
+                    platform: 'Kimi', 
+                    prompt: '2025年性价比高的新能源SUV推荐', 
+                    targetWord: '小鹏G6', 
+                    isRecommended: true, 
+                    isTop3: false, 
+                    isTop1: false, 
+                    mentionCount: 1, 
+                    status: 'completed',
+                    answer: '综合对比，推荐以下几款车型：比亚迪宋L、极氪7X、小鹏G6。其中小鹏G6智驾体验最好。',
+                    screenshot: screenshotImg
+                },
             ]
         }
     ];
@@ -121,6 +158,29 @@ const RealtimeSearch: React.FC = () => {
         } else {
             setExpandedRow(id);
         }
+    };
+
+    // Open Modal
+    const handleViewDetail = (detail: TestDetail) => {
+        setCurrentDetail(detail);
+        setIsModalOpen(true);
+    };
+
+    // Close Modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setCurrentDetail(null);
+    };
+
+    // Highlight Logic
+    const highlightText = (text: string, keyword: string) => {
+        if (!keyword || !text) return text;
+        const parts = text.split(new RegExp(`(${keyword})`, 'gi'));
+        return parts.map((part, i) => 
+            part.toLowerCase() === keyword.toLowerCase() 
+                ? <span key={i} className="bg-yellow-200 text-red-600 font-bold px-1 rounded mx-0.5">{part}</span> 
+                : part
+        );
     };
 
     return (
@@ -317,9 +377,12 @@ const RealtimeSearch: React.FC = () => {
                                                         </td>
                                                         <td className="p-3 text-center text-gray-800 font-medium">{detail.mentionCount}</td>
                                                         <td className="p-3 text-right">
-                                                            <button className="text-blue-600 hover:underline text-xs flex items-center gap-1 justify-end ml-auto">
+                                                            <button 
+                                                                onClick={() => handleViewDetail(detail)}
+                                                                className="text-blue-600 hover:underline text-xs flex items-center gap-1 justify-end ml-auto"
+                                                            >
                                                                 <FileText className="w-3 h-3" />
-                                                                3已完成---查看档案
+                                                                查看档案
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -333,6 +396,90 @@ const RealtimeSearch: React.FC = () => {
                     ))}
                 </div>
             </div>
+
+            {/* Detail Modal */}
+            {isModalOpen && currentDetail && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                        {/* Modal Header */}
+                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-blue-600" />
+                                档案详情 - {currentDetail.platform}
+                            </h3>
+                            <button onClick={closeModal} className="p-1 hover:bg-gray-200 rounded-full transition-colors">
+                                <X className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
+
+                        {/* Modal Content - Scrollable */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                            
+                            {/* Q&A Section */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Left: Q&A Text */}
+                                <div className="space-y-4">
+                                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <MessageSquare className="w-4 h-4 text-blue-600" />
+                                            <span className="font-bold text-blue-800 text-sm">用户提问 (Prompt)</span>
+                                        </div>
+                                        <p className="text-gray-700 text-sm leading-relaxed">
+                                            {currentDetail.prompt}
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Zap className="w-4 h-4 text-green-600" />
+                                            <span className="font-bold text-green-800 text-sm">AI 回答 (Answer)</span>
+                                        </div>
+                                        <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-line">
+                                            {currentDetail.answer ? (
+                                                highlightText(currentDetail.answer, currentDetail.targetWord)
+                                            ) : (
+                                                <span className="text-gray-400 italic">暂无回答内容...</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Right: Screenshot */}
+                                <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-100 flex flex-col">
+                                    <div className="p-3 border-b border-gray-200 bg-white flex items-center gap-2">
+                                        <ImageIcon className="w-4 h-4 text-gray-500" />
+                                        <span className="font-bold text-gray-700 text-sm">问答截图证据</span>
+                                    </div>
+                                    <div className="flex-1 flex items-center justify-center p-4 bg-gray-50">
+                                        {currentDetail.screenshot ? (
+                                            <img 
+                                                src={currentDetail.screenshot} 
+                                                alt="AI Answer Screenshot" 
+                                                className="max-w-full h-auto rounded shadow-sm border border-gray-200"
+                                            />
+                                        ) : (
+                                            <div className="text-gray-400 text-sm flex flex-col items-center gap-2">
+                                                <ImageIcon className="w-8 h-8 opacity-50" />
+                                                <span>暂无截图</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                            <button 
+                                onClick={closeModal}
+                                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                            >
+                                关闭
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

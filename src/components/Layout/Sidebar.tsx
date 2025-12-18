@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const settingNavItems = [
-    { path: '/knowledge', label: '知识库管理', icon: <BookOpen size={20} /> },
+    { path: '/knowledge', label: '向量知识库', icon: <BookOpen size={20} /> },
   ];
 
   const toolNavItems = [
@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Hexagon className="logo-icon" size={32} />
             <span className="logo-text">AceFlow</span>
           </div>
-          <p className="logo-subtitle">GEO 智能体系统</p>
+          <p className="logo-subtitle">让品牌被AI看见</p>
         </div>
         
         <nav className="sidebar-nav">
