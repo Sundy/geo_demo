@@ -10,7 +10,8 @@ import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
-  Zap
+  Zap,
+  Award
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -39,6 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const settingNavItems = [
     { path: '/knowledge', label: '向量知识库', icon: <BookOpen size={20} /> },
+    { path: '/qualifications', label: '资质及荣誉', icon: <Award size={20} /> },
   ];
 
   const toolNavItems = [
