@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
     FileText, Zap, PenTool, ExternalLink, Bot, Sparkles, Star, ChevronRight, 
     Copy, CheckCircle2, Circle, TrendingUp, ArrowRight, Plus, Calendar, 
-    MoreHorizontal, Send, Clock, AlertCircle, X, Search
+    MoreHorizontal, Send, Clock, AlertCircle, X, Search, Edit
 } from 'lucide-react';
 
 // --- Types ---
@@ -42,7 +42,36 @@ interface CreationPlan {
     articles: Article[];
 }
 
+interface MediaResource {
+    id: number;
+    name: string;
+    type: string;
+    price: number;
+    inclusionRate: string; // 收录率
+    publishTime: string; // 出稿时间
+    pcWeight: number; // 电脑权重
+    mobileWeight: number; // 移动权重
+    isNewsSource: boolean; // 新闻源
+    allowLink: boolean; // 可带链接
+    allowPhone: boolean; // 可带电话
+    remarks: string; // 备注
+    tags: string[];
+}
+
 // --- Mock Data ---
+
+const MOCK_MEDIA_RESOURCES: MediaResource[] = [
+    { id: 1, name: '新浪新闻-科技频道', type: '综合门户', price: 120, inclusionRate: '95%', publishTime: '24小时', pcWeight: 8, mobileWeight: 9, isNewsSource: true, allowLink: true, allowPhone: false, remarks: '白名单来源', tags: ['科技', '首发'] },
+    { id: 2, name: '腾讯网-汽车', type: '综合门户', price: 150, inclusionRate: '92%', publishTime: '12小时', pcWeight: 9, mobileWeight: 9, isNewsSource: true, allowLink: false, allowPhone: false, remarks: '需正规稿件', tags: ['汽车', '高权'] },
+    { id: 3, name: '网易财经', type: '综合门户', price: 180, inclusionRate: '88%', publishTime: '48小时', pcWeight: 7, mobileWeight: 8, isNewsSource: true, allowLink: true, allowPhone: true, remarks: '财经类首选', tags: ['财经', '深度'] },
+    { id: 4, name: '太平洋汽车网', type: '垂直媒体', price: 80, inclusionRate: '90%', publishTime: '2小时', pcWeight: 6, mobileWeight: 7, isNewsSource: false, allowLink: true, allowPhone: false, remarks: '收录快', tags: ['汽车', '垂直'] },
+    { id: 5, name: '今日头条-科技', type: '新闻客户端', price: 50, inclusionRate: '85%', publishTime: '即时', pcWeight: 5, mobileWeight: 9, isNewsSource: false, allowLink: false, allowPhone: false, remarks: '推荐流', tags: ['信息流'] },
+    { id: 6, name: '凤凰网-商业', type: '综合门户', price: 200, inclusionRate: '96%', publishTime: '24小时', pcWeight: 8, mobileWeight: 8, isNewsSource: true, allowLink: true, allowPhone: true, remarks: '审核严', tags: ['商业'] },
+    { id: 7, name: '中关村在线', type: '垂直媒体', price: 100, inclusionRate: '91%', publishTime: '6小时', pcWeight: 7, mobileWeight: 7, isNewsSource: true, allowLink: true, allowPhone: false, remarks: '数码科技', tags: ['数码'] },
+    { id: 8, name: '雪球财经', type: '垂直媒体', price: 120, inclusionRate: '89%', publishTime: '12小时', pcWeight: 6, mobileWeight: 8, isNewsSource: false, allowLink: true, allowPhone: false, remarks: '投资人群', tags: ['金融'] },
+    { id: 9, name: '36氪', type: '垂直媒体', price: 300, inclusionRate: '98%', publishTime: '审核制', pcWeight: 9, mobileWeight: 9, isNewsSource: true, allowLink: false, allowPhone: false, remarks: '创投首发', tags: ['创投'] },
+    { id: 10, name: '界面新闻', type: '新闻客户端', price: 250, inclusionRate: '94%', publishTime: '24小时', pcWeight: 8, mobileWeight: 9, isNewsSource: true, allowLink: false, allowPhone: false, remarks: '高质量', tags: ['新闻'] },
+];
 
 const MOCK_PLANS: CreationPlan[] = [
     {
@@ -152,6 +181,18 @@ const ContentStrategy: React.FC = () => {
     const [selectedSourceIds, setSelectedSourceIds] = useState<number[]>([]);
     const [generatedArticles, setGeneratedArticles] = useState<Article[]>([]);
     
+    // Media Selection State
+    const [mediaPage, setMediaPage] = useState(1);
+    const [mediaFilters, setMediaFilters] = useState({
+        channelType: '不限',
+        portal: '不限',
+        region: '不限',
+        newsSource: '不限',
+        special: '不限',
+        price: '不限',
+        sort: '默认'
+    });
+
     // New Plan Input
     const [newPlanName, setNewPlanName] = useState('');
     const [newPlanIntent, setNewPlanIntent] = useState('');
@@ -200,7 +241,8 @@ const ContentStrategy: React.FC = () => {
     const handleGenerateMock = () => {
         // Mock generation based on selected sources
         const newArticles: Article[] = selectedSourceIds.map((sid, index) => {
-            const source = RECOMMENDED_SOURCES.find(s => s.id === sid);
+            // Try to find in Media Resources first, then Recommended Sources (fallback)
+            const source = MOCK_MEDIA_RESOURCES.find(s => s.id === sid) || RECOMMENDED_SOURCES.find(s => s.id === sid);
             return {
                 id: Date.now() + index,
                 title: `[AI生成] 针对 ${source?.name} 的深度优化内容`,
@@ -251,7 +293,7 @@ const ContentStrategy: React.FC = () => {
                 <h3 className="font-bold text-gray-800 text-lg">Step 1: 定义创作意图 (Define Intent)</h3>
             </div>
 
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 max-w-3xl">
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 w-full">
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">计划名称</label>
@@ -366,97 +408,189 @@ const ContentStrategy: React.FC = () => {
         </div>
     );
 
-    const renderWizardStep2 = () => (
-        <div className="space-y-8 fade-in">
-            {/* Market Analysis */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
-                <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp className="text-blue-600 w-5 h-5" />
-                    <h3 className="font-bold text-gray-800 text-lg">Step 2.1: 意图搜索高权重信源分析 (Market Analysis)</h3>
+    const renderWizardStep2 = () => {
+        const filterGroups = [
+            { label: '频道类型', key: 'channelType', options: ['不限', 'IT科技', '健康医疗', '新闻资讯', '汽车网站', '财经商业', '娱乐休闲', '游戏网站', '亲子母婴', '食品餐饮', '生活消费', '女性时尚'] },
+            { label: '综合门户', key: 'portal', options: ['不限', '新浪网', '搜狐网', '腾讯网', '网易网', '凤凰网', '中华网', '人民网', '央视网', '千龙网', '新华网'] },
+            { label: '地区', key: 'region', options: ['不限', '综合全国', '北京', '天津', '上海', '重庆', '河北', '山西', '辽宁', '吉林', '黑龙江', '江苏', '浙江'] },
+            { label: '新闻源', key: 'newsSource', options: ['不限', '百度新闻源'] },
+            { label: '特别行业', key: 'special', options: ['不限', '金融区块链', '党政加分', '健康', '白名单来源', '移动端媒体', '需要来源媒体', '官方媒体', '官方首发'] },
+            { label: '价格分类', key: 'price', options: ['不限', '0-50', '51-100', '101-200', '200以上'] },
+        ];
+
+        return (
+            <div className="space-y-6 fade-in">
+                {/* Header */}
+                <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="text-red-600 w-5 h-5" />
+                    <h3 className="font-bold text-gray-800 text-lg">Step 2: 信源选择 (Source Selection)</h3>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {TOP_CITED_SOURCES.map((source, idx) => (
-                        <div key={idx} className="bg-white p-4 rounded-lg shadow-sm border border-blue-100 flex flex-col items-center text-center">
-                            <div className="font-bold text-gray-900 mb-1">{source.name}</div>
-                            <div className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full mb-2">权重: {source.weight}</div>
-                            <div className="text-xs text-gray-400">{source.platform}</div>
+
+                {/* Filter Panel */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4 text-sm">
+                    {filterGroups.map((group) => (
+                        <div key={group.key} className="flex items-start gap-4">
+                            <span className="text-gray-500 font-medium whitespace-nowrap pt-1 w-20 text-right">{group.label}：</span>
+                            <div className="flex flex-wrap gap-2 flex-1">
+                                {group.options.map((option) => (
+                                    <button
+                                        key={option}
+                                        onClick={() => setMediaFilters({ ...mediaFilters, [group.key]: option })}
+                                        className={`px-3 py-1 rounded hover:text-red-600 transition-colors ${
+                                            (mediaFilters as any)[group.key] === option 
+                                            ? 'bg-red-600 text-white hover:text-white' 
+                                            : 'text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        {option}
+                                    </button>
+                                ))}
+                                {group.key === 'price' && (
+                                    <div className="flex items-center gap-2 ml-4">
+                                        <input type="text" placeholder="start" className="w-16 px-2 py-1 border border-gray-200 rounded text-center text-xs" />
+                                        <span className="text-gray-400">-</span>
+                                        <input type="text" placeholder="end" className="w-16 px-2 py-1 border border-gray-200 rounded text-center text-xs" />
+                                        <button className="px-3 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 text-xs">确定</button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
+                    
+                    {/* Sort Row */}
+                    <div className="flex items-center gap-4 pt-4 border-t border-gray-100 mt-2">
+                        <span className="text-gray-500 font-medium whitespace-nowrap w-20 text-right">排序：</span>
+                        <div className="flex gap-1">
+                            {['默认', '价格', '收录率', '出稿率', '电脑权重', '移动权重', '出稿时间', '投诉'].map(sort => (
+                                <button 
+                                    key={sort}
+                                    onClick={() => setMediaFilters({ ...mediaFilters, sort })}
+                                    className={`px-3 py-1 rounded flex items-center gap-1 ${
+                                        mediaFilters.sort === sort ? 'bg-red-50 text-red-600 font-medium' : 'text-gray-600 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    {sort}
+                                    {mediaFilters.sort === sort && <ArrowRight className="w-3 h-3 rotate-90" />}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            {/* Selection */}
-            <div>
-                <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="text-red-600 w-5 h-5" />
-                    <h3 className="font-bold text-gray-800 text-lg">Step 2.2: 确认投放信源 (Confirm Sources)</h3>
+                {/* Media List Table */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
+                                <tr>
+                                    <th className="px-4 py-3 w-12 text-center">
+                                        <input type="checkbox" className="rounded border-gray-300 text-red-600 focus:ring-red-500" />
+                                    </th>
+                                    <th className="px-4 py-3">媒体名称</th>
+                                    <th className="px-4 py-3">价格</th>
+                                    <th className="px-4 py-3">收录率</th>
+                                    <th className="px-4 py-3">出稿时间</th>
+                                    <th className="px-4 py-3 text-center">电脑权重</th>
+                                    <th className="px-4 py-3 text-center">移动权重</th>
+                                    <th className="px-4 py-3 text-center">新闻源</th>
+                                    <th className="px-4 py-3 text-center">链接</th>
+                                    <th className="px-4 py-3 text-center">电话</th>
+                                    <th className="px-4 py-3">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {MOCK_MEDIA_RESOURCES.map((media) => (
+                                    <tr 
+                                        key={media.id} 
+                                        className={`hover:bg-gray-50 transition-colors cursor-pointer ${
+                                            selectedSourceIds.includes(media.id) ? 'bg-red-50/30' : ''
+                                        }`}
+                                        onClick={() => toggleSelection(media.id)}
+                                    >
+                                        <td className="px-4 py-3 text-center">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={selectedSourceIds.includes(media.id)}
+                                                onChange={() => toggleSelection(media.id)}
+                                                className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                                            />
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="font-medium text-gray-900">{media.name}</div>
+                                            <div className="flex gap-1 mt-1">
+                                                {media.tags.map(tag => (
+                                                    <span key={tag} className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded">{tag}</span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-red-600 font-bold">¥{media.price}</td>
+                                        <td className="px-4 py-3 text-green-600 font-medium">{media.inclusionRate}</td>
+                                        <td className="px-4 py-3 text-gray-600">{media.publishTime}</td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">{media.pcWeight}</span>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-bold">{media.mobileWeight}</span>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            {media.isNewsSource ? <CheckCircle2 className="w-4 h-4 text-green-500 mx-auto" /> : <span className="text-gray-300">-</span>}
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            {media.allowLink ? <CheckCircle2 className="w-4 h-4 text-green-500 mx-auto" /> : <X className="w-4 h-4 text-gray-300 mx-auto" />}
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            {media.allowPhone ? <CheckCircle2 className="w-4 h-4 text-green-500 mx-auto" /> : <X className="w-4 h-4 text-gray-300 mx-auto" />}
+                                        </td>
+                                        <td className="px-4 py-3 text-gray-500 text-xs max-w-[150px] truncate" title={media.remarks}>
+                                            {media.remarks}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {/* Pagination */}
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50">
+                        <div className="text-sm text-gray-500">
+                            显示 1 到 {MOCK_MEDIA_RESOURCES.length} 条，共 {MOCK_MEDIA_RESOURCES.length} 条
+                        </div>
+                        <div className="flex gap-2">
+                            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50" disabled>上一页</button>
+                            <button className="px-3 py-1 bg-red-600 text-white rounded text-sm font-medium">1</button>
+                            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-white">2</button>
+                            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-white">3</button>
+                            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-white">下一页</button>
+                        </div>
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {RECOMMENDED_SOURCES.map((source) => {
-                        const isSelected = selectedSourceIds.includes(source.id);
-                        return (
-                            <div 
-                                key={source.id} 
-                                className={`bg-white p-6 rounded-xl shadow-sm border transition-all cursor-pointer group relative ${
-                                    isSelected ? 'border-red-500 ring-1 ring-red-500 bg-red-50/10' : 'border-gray-200 hover:shadow-md hover:border-red-200'
-                                }`}
-                                onClick={() => toggleSelection(source.id)}
-                            >
-                                <div className="absolute top-6 right-6">
-                                    {isSelected ? (
-                                        <CheckCircle2 className="w-6 h-6 text-red-600 fill-red-50" />
-                                    ) : (
-                                        <Circle className="w-6 h-6 text-gray-300 group-hover:text-red-400" />
-                                    )}
-                                </div>
-                                <div className="flex items-start gap-4 mb-4 pr-8">
-                                    <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-600 font-bold text-xl shrink-0">
-                                        {source.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-800 text-lg group-hover:text-red-600 transition-colors">
-                                            {source.name}
-                                        </h3>
-                                        <div className="flex gap-2 mt-1 flex-wrap">
-                                            <span className="text-xs px-2 py-0.5 bg-green-50 text-green-600 border border-green-100 rounded flex items-center gap-1">
-                                                <CheckCircle2 className="w-3 h-3" /> 已匹配资源库
-                                            </span>
-                                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded">{source.type}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                                    <div className="flex items-start gap-2 mb-2 text-sm text-gray-600">
-                                        <Zap className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
-                                        <div>
-                                            <span className="font-medium">推荐理由：</span>
-                                            {source.reason}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                                    <div className="text-gray-800 font-bold text-lg">{source.price}</div>
-                                    <div className="text-xs text-gray-400">
-                                        AI匹配度 <span className="text-red-600 font-bold text-base ml-1">{source.matchScore}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+                
+                {/* Footer Actions */}
+                <div className="flex justify-between pt-6 border-t border-gray-200">
+                     <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg">
+                        <span className="font-medium">已选择:</span>
+                        <span className="text-red-600 font-bold">{selectedSourceIds.length}</span>
+                        <span>个媒体</span>
+                    </div>
+                    <div className="flex gap-3">
+                        <button 
+                            onClick={() => setStep(1)}
+                            className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+                        >
+                            上一步
+                        </button>
+                        <button 
+                            onClick={() => setStep(3)}
+                            disabled={selectedSourceIds.length === 0}
+                            className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-200 disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
+                        >
+                            确认信源并下一步 <ArrowRight className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
             </div>
-            
-            <div className="flex justify-end pt-6 border-t border-gray-200">
-                <button 
-                    onClick={() => setStep(3)}
-                    disabled={selectedSourceIds.length === 0}
-                    className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-200 disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
-                >
-                    确认信源并下一步 <ArrowRight className="w-4 h-4" />
-                </button>
-            </div>
-        </div>
-    );
+        );
+    };
 
     const renderWizardStep3 = () => (
         <div className="space-y-8 fade-in">
@@ -505,6 +639,9 @@ const ContentStrategy: React.FC = () => {
                             </div>
 
                             <div className="flex justify-end gap-3">
+                                <button className="px-4 py-2 text-gray-600 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 transition-colors flex items-center gap-2">
+                                    <Edit className="w-4 h-4" /> 在线编辑
+                                </button>
                                 <button className="px-4 py-2 text-gray-600 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 transition-colors flex items-center gap-2">
                                     <Copy className="w-4 h-4" /> 复制全文
                                 </button>
