@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
     Activity, Globe, Target, Layers, ChevronDown, MapPin, Cpu,
     MessageCircle, Award, ThumbsUp, Check, Calendar,
-    Bot, Sparkles, Zap, Moon, MessageSquare, Lightbulb, AlertTriangle
+    Bot, Sparkles, Zap, Moon, MessageSquare, Lightbulb, AlertTriangle, Database
 } from 'lucide-react';
 import InsightIndustry from './tabs/InsightIndustry';
 import InsightBrand from './tabs/InsightBrand';
@@ -17,7 +17,7 @@ const InsightDiagnosis: React.FC = () => {
     const [timeRange, setTimeRange] = useState('近7天');
     const [customStartDate, setCustomStartDate] = useState('');
     const [customEndDate, setCustomEndDate] = useState('');
-    const [selectedModels, setSelectedModels] = useState<string[]>(['Deepseek', '豆包', '千问', 'Kimi', '文心']); // Default all
+    const [selectedModels, setSelectedModels] = useState<string[]>(['Deepseek', '豆包', 'Hunyuan', '千问', 'Kimi', '文心一言']); // Default all
     
     // Tab State
     const [activeTab, setActiveTab] = useState<'industry' | 'brand' | 'competitor' | 'region'>('industry');
@@ -26,9 +26,10 @@ const InsightDiagnosis: React.FC = () => {
     const models = [
         { id: 'Deepseek', name: 'DeepSeek', icon: Bot },
         { id: '豆包', name: '豆包', icon: Sparkles },
+        { id: 'Hunyuan', name: '腾讯元宝', icon: MessageSquare },
         { id: '千问', name: '千问', icon: Zap },
         { id: 'Kimi', name: 'Kimi', icon: Moon },
-        { id: '文心', name: '文心', icon: MessageSquare },
+        { id: '文心一言', name: '文心一言', icon: Database },
     ];
 
     // Toggle model selection
@@ -67,9 +68,10 @@ const InsightDiagnosis: React.FC = () => {
         const platformData: Record<string, any> = {
             'Deepseek': { index: 58.4, mention: 4.8, top: 42.2, sentiment: 92.5 },
             '豆包': { index: 62.1, mention: 5.2, top: 45.0, sentiment: 94.0 },
+            'Hunyuan': { index: 56.5, mention: 4.6, top: 39.8, sentiment: 90.5 },
             '千问': { index: 55.8, mention: 4.5, top: 38.5, sentiment: 91.2 },
             'Kimi': { index: 60.5, mention: 5.0, top: 43.8, sentiment: 93.5 },
-            '文心': { index: 54.2, mention: 4.2, top: 35.6, sentiment: 89.8 }
+            '文心一言': { index: 54.2, mention: 4.2, top: 35.6, sentiment: 89.8 }
         };
 
         if (platforms.length === 0) return { brandIndex: 0, index: 0, mention: 0, top: 0, sentiment: 0 };

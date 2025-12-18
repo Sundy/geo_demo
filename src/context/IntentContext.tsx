@@ -16,6 +16,9 @@ export interface IntentItem {
     ragStatus?: 'hit' | 'miss';
     ragRecall?: number;
     ragAnswer?: string;
+    proofMaterials?: string[]; // New field for proof materials
+    rankingTarget?: 'top1' | 'top3' | 'visibility'; // New field for ranking target
+    materialStatus?: 'ready' | 'missing' | 'partial'; // New field for material status
 }
 
 type AddIntentItem = Omit<IntentItem, 'id' | 'segmentation'> & { segmentation?: QuerySegmentation };
@@ -43,7 +46,8 @@ export const IntentProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             targetRegions: ['全国'],
             ragStatus: 'hit',
             ragRecall: 92,
-            ragAnswer: '...小鹏G6基于SEPA 2.0扶摇架构，全系标配800V高压SiC平台...'
+            ragAnswer: '...小鹏G6基于SEPA 2.0扶摇架构，全系标配800V高压SiC平台...',
+            materialStatus: 'ready'
         },
         { 
             id: '2', 
@@ -56,7 +60,8 @@ export const IntentProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             segmentation: segmentQuery('小鹏G6真实续航打几折？'),
             expectedAnswer: '明确回答G6续航达成率在90%以上，列举媒体实测数据佐证。',
             targetRegions: ['全国'],
-            ragStatus: 'miss'
+            ragStatus: 'miss',
+            materialStatus: 'missing'
         }
     ]);
 
@@ -67,7 +72,8 @@ export const IntentProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             segmentation: item.segmentation || segmentQuery(item.query),
             expectedAnswer: item.expectedAnswer || '暂无预期回答',
             targetRegions: item.targetRegions || ['全国'],
-            ragStatus: 'miss' // Default new items to miss
+            ragStatus: 'miss', // Default new items to miss
+            materialStatus: item.proofMaterials && item.proofMaterials.length > 0 ? 'ready' : 'missing'
         };
         setIntents(prev => [newItem, ...prev]);
     };
