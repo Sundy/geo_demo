@@ -145,7 +145,7 @@ const AgentChatModal: React.FC<AgentChatModalProps> = ({ isOpen, onClose }) => {
                             <Bot className="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg">AceFlow AI 顾问</h3>
+                            <h3 className="font-bold text-lg">AI Agent</h3>
                             <p className="text-xs text-red-100 flex items-center gap-1">
                                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                                 在线中
