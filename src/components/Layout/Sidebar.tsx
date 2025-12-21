@@ -11,7 +11,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
-  Award
+  Award,
+  Bot,
+  MessageSquare
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -21,6 +23,7 @@ interface SidebarProps {
   isMobile?: boolean;
   isOpen?: boolean;
   onCloseMobile?: () => void;
+  onOpenChat?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -28,7 +31,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   toggleCollapse, 
   isMobile = false,
   isOpen = false,
-  onCloseMobile
+  onCloseMobile,
+  onOpenChat
 }) => {
   const mainNavItems = [
     { path: '/insight', label: '洞察与诊断', icon: <BarChart2 size={20} /> },
@@ -114,6 +118,46 @@ const Sidebar: React.FC<SidebarProps> = ({
               </li>
             ))}
           </ul>
+          
+          {/* Agent Chat Entry - Redesigned for Alignment & Attraction */}
+          <div className="mt-6 px-4 mb-4">
+            <button 
+                onClick={onOpenChat}
+                className={`
+                    w-full flex items-center text-left relative overflow-hidden transition-all duration-300 group
+                    ${isCollapsed ? 'justify-center p-3' : 'px-4 py-3'}
+                    rounded-2xl border-2 border-red-100 bg-gradient-to-br from-white to-red-50/50
+                    hover:border-red-200 hover:shadow-lg hover:shadow-red-100/50 hover:-translate-y-0.5
+                `}
+                title="AI Agent 对话"
+            >
+                {/* Decorative Background Element */}
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-red-100/40 to-transparent rounded-full -mr-8 -mt-8 pointer-events-none group-hover:scale-110 transition-transform" />
+
+                {/* Icon Container - Strictly aligned with nav-icon (min-w-24px) */}
+                <span className={`nav-icon flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${isCollapsed ? '' : 'mr-3'}`}>
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-red-200 rounded-full blur opacity-20 group-hover:opacity-40 animate-pulse" />
+                        <MessageSquare size={22} className="text-red-600 relative z-10" fill="currentColor" fillOpacity={0.1} />
+                        {/* Notification Dot */}
+                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full z-20" />
+                    </div>
+                </span>
+
+                {/* Text Content */}
+                <div className={`flex-1 transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
+                    <div className="flex flex-col">
+                        <span className="text-sm font-bold text-gray-800 group-hover:text-red-700 leading-none mb-1 flex items-center justify-between w-full">
+                            AI Agent
+                            <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-md font-bold transform scale-90 origin-right">LIVE</span>
+                        </span>
+                        <span className="text-xs text-gray-500 group-hover:text-red-500/80 font-medium">
+                            点击开启智能对话
+                        </span>
+                    </div>
+                </div>
+            </button>
+          </div>
         </nav>
 
         <div className="sidebar-footer">

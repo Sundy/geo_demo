@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu, Hexagon } from 'lucide-react';
 import Sidebar from './Sidebar';
+import AgentChatModal from '../AgentChatModal';
 
 const MainLayout: React.FC = () => {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -68,6 +70,7 @@ const MainLayout: React.FC = () => {
                 isMobile={isMobile}
                 isOpen={isMobileMenuOpen}
                 onCloseMobile={closeMobileMenu}
+                onOpenChat={() => setIsChatOpen(true)}
             />
             
             <main 
@@ -80,6 +83,12 @@ const MainLayout: React.FC = () => {
             >
                 <Outlet />
             </main>
+
+            {/* Agent Chat Modal */}
+            <AgentChatModal 
+                isOpen={isChatOpen} 
+                onClose={() => setIsChatOpen(false)} 
+            />
         </div>
     );
 };

@@ -3,9 +3,10 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     BarChart, Bar, Cell,
     PieChart, Pie,
-    Treemap
+    Treemap,
+    Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
-import { TrendingUp, BarChart2, PieChart as PieChartIcon, MessageSquare } from 'lucide-react';
+import { TrendingUp, BarChart2, PieChart as PieChartIcon, MessageSquare, Target, Hexagon } from 'lucide-react';
 
 interface InsightChartsProps {
     brandName?: string;
@@ -18,34 +19,137 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
     // Trend Time Filter State
     const [trendTimeFilter, setTrendTimeFilter] = useState<'day' | 'week' | 'month'>('day');
 
-    // 1. AI Mention Trend Data (Mock)
-    const trendDataMap = {
-        day: [
-            { date: '12-10', brand: 12, industry: 8 },
-            { date: '12-11', brand: 15, industry: 9 },
-            { date: '12-12', brand: 18, industry: 11 },
-            { date: '12-13', brand: 14, industry: 10 },
-            { date: '12-14', brand: 22, industry: 12 },
-            { date: '12-15', brand: 25, industry: 14 },
-            { date: '12-16', brand: 28, industry: 13 },
+    // Radar Platform Filter State
+    const [radarPlatform, setRadarPlatform] = useState<string>('Average');
+    // Competitor Selection State (Multi-select)
+    const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>(['特斯拉']);
+
+    const competitorsConfig = [
+        { name: '特斯拉', color: '#525252' }, // neutral-700
+        { name: '理想', color: '#f59e0b' },   // amber-500
+        { name: '蔚来', color: '#3b82f6' },   // blue-500
+        { name: '小米', color: '#f97316' },   // orange-500
+        { name: '极氪', color: '#8b5cf6' },   // violet-500
+    ];
+
+    const toggleCompetitor = (name: string) => {
+        setSelectedCompetitors(prev => 
+            prev.includes(name) 
+                ? prev.filter(c => c !== name) 
+                : [...prev, name]
+        );
+    };
+
+    const getCompetitorColor = (name: string) => {
+        return competitorsConfig.find(c => c.name === name)?.color || '#9ca3af';
+    };
+
+    // 0. AI Brand Asset Radar Data (New)
+    // Modified to include competitor data structure
+    // A = Brand, [CompetitorName] = Competitor Data
+    const radarDataMap: Record<string, any[]> = {
+        'Average': [
+            { subject: 'AI可见性 (Visibility)', brand: 120, fullMark: 150 },
+            { subject: '情感健康度 (Sentiment)', brand: 98, fullMark: 150 },
+            { subject: '推荐强度 (Recommendation)', brand: 86, fullMark: 150 },
+            { subject: '内容准确性 (Accuracy)', brand: 99, fullMark: 150 },
+            { subject: '话题权威性 (Authority)', brand: 85, fullMark: 150 },
+            { subject: '交互潜力 (Interaction)', brand: 65, fullMark: 150 },
         ],
-        week: [
-            { date: 'Week 46', brand: 45, industry: 30 },
-            { date: 'Week 47', brand: 52, industry: 35 },
-            { date: 'Week 48', brand: 48, industry: 38 },
-            { date: 'Week 49', brand: 60, industry: 42 },
-            { date: 'Week 50', brand: 65, industry: 40 },
+        'DeepSeek': [
+            { subject: 'AI可见性 (Visibility)', brand: 140, fullMark: 150 },
+            { subject: '情感健康度 (Sentiment)', brand: 110, fullMark: 150 },
+            { subject: '推荐强度 (Recommendation)', brand: 100, fullMark: 150 },
+            { subject: '内容准确性 (Accuracy)', brand: 120, fullMark: 150 },
+            { subject: '话题权威性 (Authority)', brand: 100, fullMark: 150 },
+            { subject: '交互潜力 (Interaction)', brand: 80, fullMark: 150 },
         ],
-        month: [
-            { date: '2024-08', brand: 180, industry: 120 },
-            { date: '2024-09', brand: 210, industry: 140 },
-            { date: '2024-10', brand: 195, industry: 150 },
-            { date: '2024-11', brand: 230, industry: 160 },
-            { date: '2024-12', brand: 250, industry: 170 },
+        '豆包': [
+            { subject: 'AI可见性 (Visibility)', brand: 110, fullMark: 150 },
+            { subject: '情感健康度 (Sentiment)', brand: 130, fullMark: 150 },
+            { subject: '推荐强度 (Recommendation)', brand: 90, fullMark: 150 },
+            { subject: '内容准确性 (Accuracy)', brand: 100, fullMark: 150 },
+            { subject: '话题权威性 (Authority)', brand: 90, fullMark: 150 },
+            { subject: '交互潜力 (Interaction)', brand: 70, fullMark: 150 },
         ]
     };
 
-    const currentTrendData = trendDataMap[trendTimeFilter];
+    // Simulate competitor data variation based on selection
+    const getRadarData = () => {
+        const baseData = radarDataMap[radarPlatform] || radarDataMap['Average'];
+        
+        return baseData.map(item => {
+            const newItem: any = { ...item };
+            // Generate mock data for each selected competitor
+            selectedCompetitors.forEach(comp => {
+                // Mock logic: generate different values based on competitor name length
+                let baseValue = 100;
+                if (comp === '特斯拉') baseValue = 130;
+                if (comp === '理想') baseValue = 115;
+                if (comp === '蔚来') baseValue = 120;
+                if (comp === '小米') baseValue = 105;
+                if (comp === '极氪') baseValue = 95;
+                
+                // Add some randomness based on subject length to vary the shape
+                const variation = (item.subject.length % 5) * 5; 
+                newItem[comp] = Math.min(150, Math.max(50, baseValue + variation));
+            });
+            return newItem;
+        });
+    };
+
+    const currentRadarData = getRadarData();
+
+    // 1. AI Mention Trend Data (Mock)
+    const trendDataMap = {
+        day: [
+            { date: '12-10', brand: 12 },
+            { date: '12-11', brand: 15 },
+            { date: '12-12', brand: 18 },
+            { date: '12-13', brand: 14 },
+            { date: '12-14', brand: 22 },
+            { date: '12-15', brand: 25 },
+            { date: '12-16', brand: 28 },
+        ],
+        week: [
+            { date: 'Week 46', brand: 45 },
+            { date: 'Week 47', brand: 52 },
+            { date: 'Week 48', brand: 48 },
+            { date: 'Week 49', brand: 60 },
+            { date: 'Week 50', brand: 65 },
+        ],
+        month: [
+            { date: '2024-08', brand: 180 },
+            { date: '2024-09', brand: 210 },
+            { date: '2024-10', brand: 195 },
+            { date: '2024-11', brand: 230 },
+            { date: '2024-12', brand: 250 },
+        ]
+    };
+
+    // Simulate trend variation
+    const getTrendData = () => {
+        const base = trendDataMap[trendTimeFilter];
+        return base.map(item => {
+            const newItem: any = { ...item };
+            selectedCompetitors.forEach(comp => {
+                 // Mock logic
+                let baseValue = item.brand;
+                if (comp === '特斯拉') baseValue += 10;
+                if (comp === '理想') baseValue -= 5;
+                if (comp === '蔚来') baseValue += 5;
+                if (comp === '小米') baseValue -= 2;
+                if (comp === '极氪') baseValue -= 8;
+                
+                // Add randomness based on date
+                const variation = (item.date.length % 3) * 2;
+                newItem[comp] = Math.max(0, baseValue + variation);
+            });
+            return newItem;
+        });
+    };
+
+    const currentTrendData = getTrendData();
 
     // 2. Brand Ranking Data (Mock)
     const rankingData = [
@@ -162,78 +266,147 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
     return (
         <div className="space-y-6 mb-8">
             {/* Section Header */}
-            <div className="flex items-center gap-2 mb-4">
-                <div className="h-8 w-1 bg-red-600 rounded-full"></div>
-                <h2 className="text-xl font-bold text-gray-800">全域诊断概览 (Global Diagnosis Overview)</h2>
-            </div>
-
-            {/* Row 1: AI Mention Trend */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-red-600" />
-                        AI提及率趋势分析 (AI Mention Rate Trend)
-                    </h3>
-                    <div className="flex gap-4 text-sm items-center">
-                        <div className="flex bg-gray-100 rounded-lg p-1">
-                            <button 
-                                onClick={() => setTrendTimeFilter('day')}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'day' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            <div className="flex flex-col gap-4 mb-4">
+                <div className="flex items-center gap-2">
+                    <div className="h-8 w-1 bg-red-600 rounded-full"></div>
+                    <h2 className="text-xl font-bold text-gray-800">全域诊断概览 (Global Diagnosis Overview)</h2>
+                </div>
+                
+                {/* Competitor Selector */}
+                <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200 w-fit">
+                    <span className="text-sm font-medium text-gray-500 px-2 shrink-0">对比竞品:</span>
+                    <div className="flex gap-2 flex-wrap">
+                        {competitorsConfig.map(comp => (
+                            <button
+                                key={comp.name}
+                                onClick={() => toggleCompetitor(comp.name)}
+                                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 ${
+                                    selectedCompetitors.includes(comp.name) 
+                                    ? 'bg-white shadow-sm border border-gray-200 font-bold' 
+                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
+                                }`}
+                                style={selectedCompetitors.includes(comp.name) ? { color: comp.color, borderColor: comp.color } : {}}
                             >
-                                日
+                                <span className={`w-2 h-2 rounded-full ${selectedCompetitors.includes(comp.name) ? '' : 'bg-gray-300'}`} 
+                                      style={selectedCompetitors.includes(comp.name) ? { backgroundColor: comp.color } : {}} 
+                                />
+                                {comp.name}
                             </button>
-                            <button 
-                                onClick={() => setTrendTimeFilter('week')}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'week' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                周
-                            </button>
-                            <button 
-                                onClick={() => setTrendTimeFilter('month')}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'month' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                月
-                            </button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="w-3 h-3 rounded-full bg-red-600"></span>
-                            <span className="text-gray-600">{brandName}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="w-3 h-3 rounded-full bg-gray-400"></span>
-                            <span className="text-gray-600">行业均值</span>
-                        </div>
+                        ))}
                     </div>
                 </div>
-                <div className="h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={currentTrendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
-                            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} unit="%" />
-                            <Tooltip 
-                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                            />
-                            <Line 
-                                type="monotone" 
-                                dataKey="brand" 
-                                stroke="#dc2626" 
-                                strokeWidth={3} 
-                                dot={{ r: 4, fill: '#dc2626', strokeWidth: 2, stroke: '#fff' }}
-                                activeDot={{ r: 6 }}
-                                name={brandName}
-                            />
-                            <Line 
-                                type="monotone" 
-                                dataKey="industry" 
-                                stroke="#9ca3af" 
-                                strokeWidth={2} 
-                                strokeDasharray="5 5"
-                                dot={false}
-                                name="行业均值"
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
+            </div>
+
+            {/* Row 1: AI Brand Asset Radar & Mention Trend */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* AI Brand Asset Radar */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <Hexagon className="w-5 h-5 text-red-600" />
+                            数字品牌资产雷达 (Digital Brand Assets)
+                        </h3>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-6 pl-7">对比维度：{brandName} vs 竞品 ({selectedCompetitors.length})</p>
+                    
+                    <div className="h-[300px] w-full flex justify-center">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={currentRadarData}>
+                                <PolarGrid stroke="#e5e7eb" />
+                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 10 }} />
+                                <PolarRadiusAxis angle={30} domain={[0, 150]} tick={false} axisLine={false} />
+                                <Radar
+                                    name={brandName}
+                                    dataKey="brand"
+                                    stroke="#dc2626"
+                                    strokeWidth={3}
+                                    fill="#dc2626"
+                                    fillOpacity={0.2}
+                                />
+                                {selectedCompetitors.map(compName => (
+                                    <Radar
+                                        key={compName}
+                                        name={compName}
+                                        dataKey={compName}
+                                        stroke={getCompetitorColor(compName)}
+                                        strokeWidth={2}
+                                        fill={getCompetitorColor(compName)}
+                                        fillOpacity={0.1}
+                                    />
+                                ))}
+                                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                />
+                            </RadarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* AI Mention Trend */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-red-600" />
+                            AI提及率趋势分析 (AI Mention Rate Trend)
+                        </h3>
+                        <div className="flex gap-2 text-sm items-center">
+                            <div className="flex bg-gray-100 rounded-lg p-1">
+                                <button 
+                                    onClick={() => setTrendTimeFilter('day')}
+                                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'day' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    日
+                                </button>
+                                <button 
+                                    onClick={() => setTrendTimeFilter('week')}
+                                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'week' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    周
+                                </button>
+                                <button 
+                                    onClick={() => setTrendTimeFilter('month')}
+                                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendTimeFilter === 'month' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    月
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={currentTrendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} unit="%" />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                />
+                                <Line 
+                                    type="monotone" 
+                                    dataKey="brand" 
+                                    stroke="#dc2626" 
+                                    strokeWidth={3} 
+                                    dot={{ r: 4, fill: '#dc2626', strokeWidth: 2, stroke: '#fff' }}
+                                    activeDot={{ r: 6 }}
+                                    name={brandName}
+                                />
+                                {selectedCompetitors.map(compName => (
+                                    <Line 
+                                        key={compName}
+                                        type="monotone" 
+                                        dataKey={compName}
+                                        stroke={getCompetitorColor(compName)}
+                                        strokeWidth={2} 
+                                        strokeDasharray="5 5"
+                                        dot={false}
+                                        name={compName}
+                                    />
+                                ))}
+                                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             </div>
 

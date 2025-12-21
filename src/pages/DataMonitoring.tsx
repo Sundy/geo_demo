@@ -51,97 +51,97 @@ const PLANS: MonitoringPlan[] = [
 
 const MOCK_PLATFORM_DATA: Record<string, {
     metrics: { intentRate: string; citationRate: string; recRate: string; top1Rate: string; longTail: number };
-    trend: { date: string; rate: number; event: string | null }[];
+    trend: { date: string; rate: number; optimizedRate: number; event: string | null }[];
 }> = {
     'all': {
         metrics: { intentRate: '82.5%', citationRate: '72.8%', recRate: '58.2%', top1Rate: '21.4%', longTail: 15 },
         trend: [
-            { date: '12-01', rate: 12, event: null },
-            { date: '12-05', rate: 15, event: null },
-            { date: '12-10', rate: 18, event: '计划启动' },
-            { date: '12-15', rate: 25, event: null },
-            { date: '12-20', rate: 42, event: '内容发布' },
-            { date: '12-25', rate: 58, event: null },
-            { date: '12-30', rate: 65, event: null },
-            { date: '01-05', rate: 72, event: null },
+            { date: '12-01', rate: 12, optimizedRate: 5, event: null },
+            { date: '12-05', rate: 15, optimizedRate: 8, event: null },
+            { date: '12-10', rate: 18, optimizedRate: 15, event: '计划启动' },
+            { date: '12-15', rate: 25, optimizedRate: 30, event: null },
+            { date: '12-20', rate: 42, optimizedRate: 55, event: '内容发布' },
+            { date: '12-25', rate: 58, optimizedRate: 70, event: null },
+            { date: '12-30', rate: 65, optimizedRate: 82, event: null },
+            { date: '01-05', rate: 72, optimizedRate: 88, event: null },
         ]
     },
     'Deepseek': {
         metrics: { intentRate: '90.2%', citationRate: '85.4%', recRate: '68.5%', top1Rate: '32.1%', longTail: 8 },
         trend: [
-            { date: '12-01', rate: 15, event: null },
-            { date: '12-05', rate: 20, event: null },
-            { date: '12-10', rate: 25, event: '计划启动' },
-            { date: '12-15', rate: 35, event: null },
-            { date: '12-20', rate: 55, event: '内容发布' },
-            { date: '12-25', rate: 75, event: null },
-            { date: '12-30', rate: 82, event: null },
-            { date: '01-05', rate: 88, event: null },
+            { date: '12-01', rate: 15, optimizedRate: 10, event: null },
+            { date: '12-05', rate: 20, optimizedRate: 12, event: null },
+            { date: '12-10', rate: 25, optimizedRate: 20, event: '计划启动' },
+            { date: '12-15', rate: 35, optimizedRate: 40, event: null },
+            { date: '12-20', rate: 55, optimizedRate: 65, event: '内容发布' },
+            { date: '12-25', rate: 75, optimizedRate: 85, event: null },
+            { date: '12-30', rate: 82, optimizedRate: 92, event: null },
+            { date: '01-05', rate: 88, optimizedRate: 95, event: null },
         ]
     },
     '豆包': {
         metrics: { intentRate: '78.5%', citationRate: '68.2%', recRate: '52.4%', top1Rate: '18.5%', longTail: 6 },
         trend: [
-            { date: '12-01', rate: 10, event: null },
-            { date: '12-05', rate: 12, event: null },
-            { date: '12-10', rate: 15, event: '计划启动' },
-            { date: '12-15', rate: 20, event: null },
-            { date: '12-20', rate: 35, event: '内容发布' },
-            { date: '12-25', rate: 48, event: null },
-            { date: '12-30', rate: 55, event: null },
-            { date: '01-05', rate: 62, event: null },
+            { date: '12-01', rate: 10, optimizedRate: 5, event: null },
+            { date: '12-05', rate: 12, optimizedRate: 6, event: null },
+            { date: '12-10', rate: 15, optimizedRate: 10, event: '计划启动' },
+            { date: '12-15', rate: 20, optimizedRate: 25, event: null },
+            { date: '12-20', rate: 35, optimizedRate: 45, event: '内容发布' },
+            { date: '12-25', rate: 48, optimizedRate: 60, event: null },
+            { date: '12-30', rate: 55, optimizedRate: 70, event: null },
+            { date: '01-05', rate: 62, optimizedRate: 78, event: null },
         ]
     },
     '腾讯元宝': {
         metrics: { intentRate: '75.0%', citationRate: '65.1%', recRate: '48.9%', top1Rate: '15.2%', longTail: 4 },
         trend: [
-            { date: '12-01', rate: 8, event: null },
-            { date: '12-05', rate: 10, event: null },
-            { date: '12-10', rate: 12, event: '计划启动' },
-            { date: '12-15', rate: 18, event: null },
-            { date: '12-20', rate: 30, event: '内容发布' },
-            { date: '12-25', rate: 42, event: null },
-            { date: '12-30', rate: 50, event: null },
-            { date: '01-05', rate: 58, event: null },
+            { date: '12-01', rate: 8, optimizedRate: 4, event: null },
+            { date: '12-05', rate: 10, optimizedRate: 5, event: null },
+            { date: '12-10', rate: 12, optimizedRate: 8, event: '计划启动' },
+            { date: '12-15', rate: 18, optimizedRate: 15, event: null },
+            { date: '12-20', rate: 30, optimizedRate: 25, event: '内容发布' },
+            { date: '12-25', rate: 42, optimizedRate: 35, event: null },
+            { date: '12-30', rate: 50, optimizedRate: 45, event: null },
+            { date: '01-05', rate: 58, optimizedRate: 52, event: null },
         ]
     },
     '千问': {
         metrics: { intentRate: '81.3%', citationRate: '70.5%', recRate: '55.3%', top1Rate: '20.1%', longTail: 7 },
         trend: [
-            { date: '12-01', rate: 11, event: null },
-            { date: '12-05', rate: 14, event: null },
-            { date: '12-10', rate: 17, event: '计划启动' },
-            { date: '12-15', rate: 24, event: null },
-            { date: '12-20', rate: 40, event: '内容发布' },
-            { date: '12-25', rate: 56, event: null },
-            { date: '12-30', rate: 63, event: null },
-            { date: '01-05', rate: 70, event: null },
+            { date: '12-01', rate: 11, optimizedRate: 6, event: null },
+            { date: '12-05', rate: 14, optimizedRate: 8, event: null },
+            { date: '12-10', rate: 17, optimizedRate: 12, event: '计划启动' },
+            { date: '12-15', rate: 24, optimizedRate: 20, event: null },
+            { date: '12-20', rate: 40, optimizedRate: 35, event: '内容发布' },
+            { date: '12-25', rate: 56, optimizedRate: 48, event: null },
+            { date: '12-30', rate: 63, optimizedRate: 58, event: null },
+            { date: '01-05', rate: 70, optimizedRate: 65, event: null },
         ]
     },
     'Kimi': {
         metrics: { intentRate: '86.7%', citationRate: '75.8%', recRate: '62.1%', top1Rate: '25.4%', longTail: 9 },
         trend: [
-            { date: '12-01', rate: 13, event: null },
-            { date: '12-05', rate: 16, event: null },
-            { date: '12-10', rate: 20, event: '计划启动' },
-            { date: '12-15', rate: 28, event: null },
-            { date: '12-20', rate: 45, event: '内容发布' },
-            { date: '12-25', rate: 62, event: null },
-            { date: '12-30', rate: 70, event: null },
-            { date: '01-05', rate: 78, event: null },
+            { date: '12-01', rate: 13, optimizedRate: 7, event: null },
+            { date: '12-05', rate: 16, optimizedRate: 9, event: null },
+            { date: '12-10', rate: 20, optimizedRate: 15, event: '计划启动' },
+            { date: '12-15', rate: 28, optimizedRate: 25, event: null },
+            { date: '12-20', rate: 45, optimizedRate: 40, event: '内容发布' },
+            { date: '12-25', rate: 62, optimizedRate: 55, event: null },
+            { date: '12-30', rate: 70, optimizedRate: 65, event: null },
+            { date: '01-05', rate: 78, optimizedRate: 72, event: null },
         ]
     },
     '文心一言': {
         metrics: { intentRate: '72.1%', citationRate: '62.4%', recRate: '45.8%', top1Rate: '12.5%', longTail: 5 },
         trend: [
-            { date: '12-01', rate: 9, event: null },
-            { date: '12-05', rate: 11, event: null },
-            { date: '12-10', rate: 13, event: '计划启动' },
-            { date: '12-15', rate: 19, event: null },
-            { date: '12-20', rate: 32, event: '内容发布' },
-            { date: '12-25', rate: 45, event: null },
-            { date: '12-30', rate: 52, event: null },
-            { date: '01-05', rate: 60, event: null },
+            { date: '12-01', rate: 9, optimizedRate: 4, event: null },
+            { date: '12-05', rate: 11, optimizedRate: 5, event: null },
+            { date: '12-10', rate: 13, optimizedRate: 7, event: '计划启动' },
+            { date: '12-15', rate: 19, optimizedRate: 12, event: null },
+            { date: '12-20', rate: 32, optimizedRate: 20, event: '内容发布' },
+            { date: '12-25', rate: 45, optimizedRate: 30, event: null },
+            { date: '12-30', rate: 52, optimizedRate: 38, event: null },
+            { date: '01-05', rate: 60, optimizedRate: 45, event: null },
         ]
     }
 };
@@ -461,6 +461,10 @@ const DataMonitoring: React.FC = () => {
                                     <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
                                     <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                                 </linearGradient>
+                                <linearGradient id="colorOptimized" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                             <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} />
@@ -475,6 +479,17 @@ const DataMonitoring: React.FC = () => {
                                 strokeWidth={3}
                                 fillOpacity={1} 
                                 fill="url(#colorRate)" 
+                                name="总体意图渗透率"
+                            />
+                            <Area 
+                                type="monotone" 
+                                dataKey="optimizedRate" 
+                                stroke="#3b82f6" 
+                                strokeWidth={3}
+                                strokeDasharray="5 5"
+                                fillOpacity={1} 
+                                fill="url(#colorOptimized)" 
+                                name="优化词增长曲线"
                             />
                             {/* Event Markers */}
                             {trend.map((entry, index) => (
