@@ -172,7 +172,8 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
     // Enhanced with colors for cloud effect
     const colors = [
         'text-red-600', 'text-orange-500', 'text-blue-500', 'text-green-600', 
-        'text-purple-600', 'text-indigo-500', 'text-pink-500', 'text-teal-600'
+        'text-purple-600', 'text-indigo-500', 'text-pink-500', 'text-teal-600',
+        'text-cyan-600', 'text-sky-500', 'text-rose-500', 'text-amber-600'
     ];
 
     const getRandomColor = (index: number) => colors[index % colors.length];
@@ -216,7 +217,84 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
         { word: '异响问题', count: 10 },
     ];
 
-    const currentKeywords = activeKeywordTab === 'positive' ? positiveKeywords : negativeKeywords;
+    // Helper to render the Cloud with "Center-Heavy" layout
+    const renderWordCloud = () => {
+        const raw = activeKeywordTab === 'positive' ? positiveKeywords : negativeKeywords;
+        const sorted = [...raw].sort((a, b) => b.count - a.count);
+        
+        // Distribution Logic
+        // We split the sorted items into 5 layers vertically to simulate a sphere/cloud
+        const total = sorted.length;
+        
+        // Dynamic chunk sizes based on total count
+        const centerCount = Math.max(1, Math.floor(total * 0.15)); // Top ~15% (Biggest)
+        const innerCount = Math.max(2, Math.floor(total * 0.35));  // Next ~35% (Medium)
+        // The rest go to outer
+        
+        const centerItems = sorted.slice(0, centerCount);
+        const innerItems = sorted.slice(centerCount, centerCount + innerCount);
+        const outerItems = sorted.slice(centerCount + innerCount);
+        
+        // Split Inner and Outer into Top/Bottom halves for symmetry
+        const innerTop = innerItems.slice(0, Math.ceil(innerItems.length / 2));
+        const innerBottom = innerItems.slice(Math.ceil(innerItems.length / 2));
+        
+        const outerTop = outerItems.slice(0, Math.ceil(outerItems.length / 2));
+        const outerBottom = outerItems.slice(Math.ceil(outerItems.length / 2));
+        
+        // Helper to organize a horizontal row with "Center Heaviest" logic
+        const organizeRow = (items: typeof raw) => {
+            const res: typeof raw = [];
+            let left = true;
+            items.forEach(item => {
+                if(left) res.push(item); // Push right
+                else res.unshift(item);  // Push left
+                left = !left;
+            });
+            return res;
+        };
+
+        const renderRow = (items: typeof raw, baseSizeMult: number, className: string) => (
+            <div className={`flex flex-wrap justify-center items-end gap-x-4 gap-y-2 ${className}`}>
+                {organizeRow(items).map((item) => {
+                    const colorIndex = item.word.length + item.count;
+                    return (
+                        <span 
+                            key={item.word}
+                            className={`font-bold cursor-default transition-all duration-300 hover:scale-110 leading-none ${colors[colorIndex % colors.length]}`}
+                            style={{ 
+                                fontSize: Math.max(0.6, 0.4 + (item.count / 100) * 2.5 * baseSizeMult) + 'rem',
+                                opacity: 0.5 + (item.count / 100) * 0.5,
+                                textShadow: item.count > 60 ? '0 4px 12px rgba(0,0,0,0.08)' : 'none'
+                            }}
+                            title={`${item.word}: ${item.count}`}
+                        >
+                            {item.word}
+                        </span>
+                    );
+                })}
+            </div>
+        );
+
+        return (
+            <div className="flex flex-col items-center justify-center py-6 min-h-[350px] select-none">
+                {/* Layer 1: Outer Top (Smallest) */}
+                {renderRow(outerTop, 0.8, "mb-2 opacity-80")}
+                
+                {/* Layer 2: Inner Top (Medium) */}
+                {renderRow(innerTop, 0.9, "mb-1 opacity-90")}
+                
+                {/* Layer 3: Center (Biggest) */}
+                {renderRow(centerItems, 1.1, "z-10 my-2")}
+                
+                {/* Layer 4: Inner Bottom (Medium) */}
+                {renderRow(innerBottom, 0.9, "mt-1 opacity-90")}
+                
+                {/* Layer 5: Outer Bottom (Smallest) */}
+                {renderRow(outerBottom, 0.8, "mt-2 opacity-80")}
+            </div>
+        );
+    };
 
     // 5. Source Distribution Data (Mock) - Treemap Format
     const sourceData = [
@@ -524,20 +602,8 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
                     </div>
 
                     {/* Word Cloud Container */}
-                    <div className="min-h-[300px] border border-gray-100 rounded-2xl p-8 flex flex-wrap justify-center items-center content-center gap-x-8 gap-y-4 bg-white">
-                        {currentKeywords.map((item, index) => (
-                            <span 
-                                key={index}
-                                className={`font-bold cursor-default transition-all duration-300 hover:scale-110 ${getRandomColor(index)}`}
-                                style={{ 
-                                    fontSize: Math.max(0.8, 1 + (item.count / 100) * 1.5) + 'rem',
-                                    opacity: 0.6 + (item.count / 100) * 0.4
-                                }}
-                                title={`${item.word}: ${item.count}`}
-                            >
-                                {item.word}
-                            </span>
-                        ))}
+                    <div className="border border-gray-100 rounded-2xl bg-white">
+                        {renderWordCloud()}
                     </div>
                 </div>
 
