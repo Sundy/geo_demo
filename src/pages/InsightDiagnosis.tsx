@@ -9,6 +9,8 @@ import InsightBrand from './tabs/InsightBrand';
 import InsightCompetitor from './tabs/InsightCompetitor';
 import InsightRegion from './tabs/InsightRegion';
 import InsightCharts from '../components/InsightCharts';
+import SearchHeatAnalysis from '../components/SearchHeatAnalysis';
+import HotWordsAnalysis from '../components/HotWordsAnalysis';
 
 const InsightDiagnosis: React.FC = () => {
     // Filter States
@@ -64,50 +66,103 @@ const InsightDiagnosis: React.FC = () => {
 
     // Mock global metrics based on platform aggregation
     const getMetrics = (platforms: string[]) => {
-        // Base metrics data for each platform (Mock)
-        const platformData: Record<string, any> = {
-            'Deepseek': { index: 58.4, mention: 4.8, top: 42.2, sentiment: 92.5 },
-            '豆包': { index: 62.1, mention: 5.2, top: 45.0, sentiment: 94.0 },
-            'Hunyuan': { index: 56.5, mention: 4.6, top: 39.8, sentiment: 90.5 },
-            '千问': { index: 55.8, mention: 4.5, top: 38.5, sentiment: 91.2 },
-            'Kimi': { index: 60.5, mention: 5.0, top: 43.8, sentiment: 93.5 },
-            '文心一言': { index: 54.2, mention: 4.2, top: 35.6, sentiment: 89.8 }
-        };
-
-        if (platforms.length === 0) return { brandIndex: 0, index: 0, mention: 0, top: 0, sentiment: 0 };
-
-        // Calculate average
-        let totalIndex = 0, totalMention = 0, totalTop = 0, totalSentiment = 0;
-        
-        platforms.forEach(p => {
-            const data = platformData[p] || platformData['Deepseek'];
-            totalIndex += data.index;
-            totalMention += data.mention;
-            totalTop += data.top;
-            totalSentiment += data.sentiment;
-        });
-
-        const count = platforms.length;
-        const avgIndex = totalIndex / count;
-        const avgMention = totalMention / count;
-        const avgTop = totalTop / count;
-        const avgSentiment = totalSentiment / count;
+        // 1. Mock Base Data
+        const baseSearchHeat = 85.4;
+        const baseMention = 4.7;
+        const baseSentiment = 91.9;
+        const baseSourceScore = 78.5;
 
         // Calculate Brand Index (Weighted Score)
-        // Formula: Index * 0.4 + Mention * 0.2 + Top * 0.2 + Sentiment * 0.2
-        // Note: Mention is typically low (e.g. 5%), so we normalize it by multiplying by 10 or similar? 
-        // Or just use the raw values if that's the business logic. 
-        // Let's assume a normalized calculation for demo:
-        // (Index + Top + Sentiment + Mention * 5) / 4 (Just a mock logic)
-        const brandIndex = (avgIndex * 0.4 + avgTop * 0.3 + avgSentiment * 0.3).toFixed(1);
+        // Normalize Mention Rate (4.7% is actually quite high for SOV, let's treat it as a score out of 100 for index calc ~ 4.7 * 10 = 47)
+        // Formula: Search * 0.2 + MentionScore * 0.3 + Sentiment * 0.3 + Source * 0.2
+        const mentionScore = baseMention * 10; 
+        const brandIndex = (baseSearchHeat * 0.25 + mentionScore * 0.25 + baseSentiment * 0.25 + baseSourceScore * 0.25).toFixed(1);
 
-        return {
-            brandIndex,
-            index: avgIndex.toFixed(1),
-            mention: avgMention.toFixed(1),
-            top: avgTop.toFixed(1),
-            sentiment: avgSentiment.toFixed(1)
-        };
+        const metricsList = [
+            {
+                id: 'brand_index',
+                title: 'AI品牌指数',
+                value: brandIndex,
+                unit: '',
+                icon: Sparkles,
+                color: 'text-red-600',
+                bg: 'bg-red-50',
+                trend: null,
+                details: [
+                    { label: '综合评分', value: 'Weighted Score' },
+                    { label: '算法版本', value: 'v2.0' },
+                ]
+            },
+            {
+                id: 'search_heat',
+                title: 'AI搜索热度',
+                value: baseSearchHeat,
+                unit: '',
+                icon: Activity,
+                color: 'text-orange-500',
+                bg: 'bg-orange-50',
+                trend: '+2.4%',
+                details: [
+                    { label: '行业热门搜索', value: '新能源SUV' },
+                    { label: '品牌热门搜索', value: '小鹏G6' },
+                    { label: '竞品热门搜索', value: 'Model Y' },
+                    { label: '热门城市', value: '上海' },
+                    { label: '热门周期', value: '周末' },
+                    { label: '近期热门词', value: '800V快充' },
+                ]
+            },
+            {
+                id: 'mention_rate',
+                title: '提及率',
+                value: baseMention,
+                unit: '%',
+                icon: MessageCircle,
+                color: 'text-blue-500',
+                bg: 'bg-blue-50',
+                trend: '+0.5%',
+                details: [
+                    { label: '提及率', value: '4.7%' },
+                    { label: 'Top3提及率', value: '12.5%' },
+                    { label: 'Top1提及率', value: '40.8%' },
+                    { label: '提及份额(SOV)', value: '15.2%' },
+                ]
+            },
+            {
+                id: 'sentiment',
+                title: '情感度',
+                value: baseSentiment,
+                unit: '%',
+                icon: ThumbsUp,
+                color: 'text-green-500',
+                bg: 'bg-green-50',
+                trend: '-0.3%',
+                details: [
+                    { label: '正向占比', value: '62%' },
+                    { label: '中性占比', value: '28%' },
+                    { label: '负面占比', value: '10%' },
+                    { label: 'Top正向词', value: '智驾领先' },
+                    { label: 'Top负面词', value: '续航焦虑' },
+                ]
+            },
+            {
+                id: 'source_score',
+                title: '信源分数',
+                value: baseSourceScore,
+                unit: '',
+                icon: Globe,
+                color: 'text-purple-500',
+                bg: 'bg-purple-50',
+                trend: '+1.2%',
+                details: [
+                    { label: '来源权重', value: '8.5/10' },
+                    { label: '来源偏好度', value: '高' },
+                    { label: '来源趋势', value: '上升' },
+                    { label: 'Top引用文章', value: '小鹏G6深度评测...' },
+                ]
+            }
+        ];
+
+        return metricsList;
     };
 
     const metrics = getMetrics(selectedModels);
@@ -244,78 +299,65 @@ const InsightDiagnosis: React.FC = () => {
                 </div>
             </div>
 
-            {/* Global Core Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl shadow-sm border border-red-100 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                            <p className="text-sm text-gray-500 mb-1">AI品牌指数</p>
-                            <h3 className="text-3xl font-bold text-red-600">{metrics.brandIndex}</h3>
+            {/* Global Core Metrics - 5 Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                {metrics.map((metric) => (
+                    <div 
+                        key={metric.id} 
+                        className="group relative bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-default"
+                    >
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <p className="text-sm text-gray-500 mb-1 font-medium">{metric.title}</p>
+                                <h3 className={`text-3xl font-bold ${metric.id === 'brand_index' ? 'text-red-600' : 'text-gray-800'}`}>
+                                    {metric.value}
+                                    {metric.unit && <span className="text-lg text-gray-400 font-normal ml-1">{metric.unit}</span>}
+                                </h3>
+                            </div>
+                            <div className={`p-2 rounded-lg ${metric.bg}`}>
+                                <metric.icon className={`w-6 h-6 ${metric.color}`} />
+                            </div>
                         </div>
-                        <div className="p-2 rounded-lg bg-red-100">
-                            <Sparkles className="w-6 h-6 text-red-600" />
-                        </div>
-                    </div>
-                    <div className="flex items-center text-sm">
-                        <span className="text-red-600 font-medium">综合评分</span>
-                        <span className="text-gray-400 ml-2">Weighted Score</span>
-                    </div>
-                </div>
+                        {metric.trend && (
+                            <div className="flex items-center text-sm">
+                                <span className={metric.trend.startsWith('+') ? 'text-green-500' : 'text-red-500'}>
+                                    {metric.trend}
+                                </span>
+                                <span className="text-gray-400 ml-2">较上周</span>
+                            </div>
+                        )}
+                        {metric.id === 'brand_index' && (
+                            <div className="flex items-center text-sm">
+                                <span className="text-red-600 font-medium">综合评分</span>
+                                <span className="text-gray-400 ml-2">Weighted Score</span>
+                            </div>
+                        )}
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                            <p className="text-sm text-gray-500 mb-1">AI提及率</p>
-                            <h3 className="text-3xl font-bold text-gray-800">
-                                {metrics.mention}<span className="text-lg text-gray-400 font-normal ml-1">%</span>
-                            </h3>
-                        </div>
-                        <div className="p-2 rounded-lg bg-red-50">
-                            <MessageCircle className="w-6 h-6 text-red-400" />
-                        </div>
-                    </div>
-                    <div className="flex items-center text-sm">
-                        <span className="text-green-500">+0.5%</span>
-                        <span className="text-gray-400 ml-2">较上周</span>
-                    </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                            <p className="text-sm text-gray-500 mb-1">首位提及率</p>
-                            <h3 className="text-3xl font-bold text-gray-800">
-                                {metrics.top}<span className="text-lg text-gray-400 font-normal ml-1">%</span>
-                            </h3>
-                        </div>
-                        <div className="p-2 rounded-lg bg-gray-50">
-                            <Award className="w-6 h-6 text-gray-600" />
+                        {/* Hover Tooltip for Sub-items */}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-64 bg-white shadow-xl rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none border border-gray-100 invisible group-hover:visible">
+                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
+                            <h4 className="font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-100 text-sm flex items-center gap-2">
+                                <metric.icon className="w-4 h-4 text-gray-500" />
+                                {metric.title}细分
+                            </h4>
+                            <div className="space-y-2">
+                                {metric.details.map((detail, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-sm">
+                                        <span className="text-gray-500">{detail.label}</span>
+                                        <span className="font-medium text-gray-800 truncate max-w-[120px]" title={String(detail.value)}>{detail.value}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                    <div className="flex items-center text-sm">
-                        <span className="text-green-500">+1.8%</span>
-                        <span className="text-gray-400 ml-2">较上周</span>
-                    </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                            <p className="text-sm text-gray-500 mb-1">正面情绪占比</p>
-                            <h3 className="text-3xl font-bold text-gray-800">
-                                {metrics.sentiment}<span className="text-lg text-gray-400 font-normal ml-1">%</span>
-                            </h3>
-                        </div>
-                        <div className="p-2 rounded-lg bg-gray-50">
-                            <ThumbsUp className="w-6 h-6 text-gray-500" />
-                        </div>
-                    </div>
-                    <div className="flex items-center text-sm">
-                        <span className="text-red-500">-0.3%</span>
-                        <span className="text-gray-400 ml-2">较上周</span>
-                    </div>
-                </div>
+                ))}
             </div>
+
+            {/* 1. AI Search Heat Analysis (New Section) */}
+            <SearchHeatAnalysis brandName={selectedBrand} timeRange={timeRange} />
+
+            {/* 2. Hot Words Analysis (New Section) */}
+            <HotWordsAnalysis brandName={selectedBrand} />
 
             {/* Global Analysis Charts */}
             <InsightCharts brandName={selectedBrand} />

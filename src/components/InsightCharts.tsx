@@ -49,28 +49,25 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
     // A = Brand, [CompetitorName] = Competitor Data
     const radarDataMap: Record<string, any[]> = {
         'Average': [
-            { subject: 'AI可见性 (Visibility)', brand: 120, fullMark: 150 },
-            { subject: '情感健康度 (Sentiment)', brand: 98, fullMark: 150 },
-            { subject: '推荐强度 (Recommendation)', brand: 86, fullMark: 150 },
-            { subject: '内容准确性 (Accuracy)', brand: 99, fullMark: 150 },
-            { subject: '话题权威性 (Authority)', brand: 85, fullMark: 150 },
-            { subject: '交互潜力 (Interaction)', brand: 65, fullMark: 150 },
+            { subject: 'AI搜索引擎流量监测', brand: 120, fullMark: 150 },
+            { subject: '品牌AI情感度监测', brand: 98, fullMark: 150 },
+            { subject: '品牌AI知名度监测', brand: 86, fullMark: 150 },
+            { subject: '引用来源监测', brand: 99, fullMark: 150 },
+            { subject: 'AI搜索热度', brand: 85, fullMark: 150 },
         ],
         'DeepSeek': [
-            { subject: 'AI可见性 (Visibility)', brand: 140, fullMark: 150 },
-            { subject: '情感健康度 (Sentiment)', brand: 110, fullMark: 150 },
-            { subject: '推荐强度 (Recommendation)', brand: 100, fullMark: 150 },
-            { subject: '内容准确性 (Accuracy)', brand: 120, fullMark: 150 },
-            { subject: '话题权威性 (Authority)', brand: 100, fullMark: 150 },
-            { subject: '交互潜力 (Interaction)', brand: 80, fullMark: 150 },
+            { subject: 'AI搜索引擎流量监测', brand: 140, fullMark: 150 },
+            { subject: '品牌AI情感度监测', brand: 110, fullMark: 150 },
+            { subject: '品牌AI知名度监测', brand: 100, fullMark: 150 },
+            { subject: '引用来源监测', brand: 120, fullMark: 150 },
+            { subject: 'AI搜索热度', brand: 100, fullMark: 150 },
         ],
         '豆包': [
-            { subject: 'AI可见性 (Visibility)', brand: 110, fullMark: 150 },
-            { subject: '情感健康度 (Sentiment)', brand: 130, fullMark: 150 },
-            { subject: '推荐强度 (Recommendation)', brand: 90, fullMark: 150 },
-            { subject: '内容准确性 (Accuracy)', brand: 100, fullMark: 150 },
-            { subject: '话题权威性 (Authority)', brand: 90, fullMark: 150 },
-            { subject: '交互潜力 (Interaction)', brand: 70, fullMark: 150 },
+            { subject: 'AI搜索引擎流量监测', brand: 110, fullMark: 150 },
+            { subject: '品牌AI情感度监测', brand: 130, fullMark: 150 },
+            { subject: '品牌AI知名度监测', brand: 90, fullMark: 150 },
+            { subject: '引用来源监测', brand: 100, fullMark: 150 },
+            { subject: 'AI搜索热度', brand: 90, fullMark: 150 },
         ]
     };
 
