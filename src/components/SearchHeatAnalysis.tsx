@@ -3,7 +3,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
     LineChart, Line, Legend 
 } from 'recharts';
-import { Activity, Flame, Search, MapPin, Calendar, TrendingUp } from 'lucide-react';
+import { Activity, Flame, Search, MapPin, Calendar, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface SearchHeatAnalysisProps {
     brandName?: string;
@@ -92,45 +92,66 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
     const trendData = getTrendData();
 
     // Helper Component for List
-    const SearchList = ({ title, icon: Icon, data, colorClass }: { title: string, icon: any, data: any[], colorClass: string }) => (
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex-1 min-w-[300px]">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <div className={`p-1.5 rounded-lg ${colorClass} bg-opacity-10`}>
-                    <Icon className={`w-4 h-4 ${colorClass}`} />
-                </div>
-                {title}
-            </h3>
-            <div className="space-y-3">
-                {/* Header */}
-                <div className="flex text-xs font-medium text-gray-400 pb-2 border-b border-gray-50">
-                    <span className="w-8 text-center">排名</span>
-                    <span className="flex-1 px-2">热门问题 / 意向词</span>
-                    <span className="w-16 text-right">热度</span>
-                </div>
-                {/* Rows */}
-                {data.map((item, idx) => (
-                    <div key={idx} className="flex items-center text-sm group hover:bg-gray-50 p-1.5 rounded-lg transition-colors cursor-default">
-                        <span className={`w-8 text-center font-bold ${idx < 3 ? 'text-red-500' : 'text-gray-400'}`}>
-                            {item.rank}
-                        </span>
-                        <div className="flex-1 px-2 min-w-0">
-                            <div className="font-medium text-gray-800 truncate" title={item.question}>
-                                {item.question}
-                            </div>
-                            <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                                <Search className="w-3 h-3 text-gray-300" />
-                                {item.keyword}
-                            </div>
-                        </div>
-                        <div className="w-16 text-right font-medium text-orange-500 flex items-center justify-end gap-1">
-                            <Flame className="w-3 h-3" />
-                            {(item.heat / 1000).toFixed(1)}k
-                        </div>
+    const SearchList = ({ title, icon: Icon, data, colorClass }: { title: string, icon: any, data: any[], colorClass: string }) => {
+        const [expanded, setExpanded] = useState(false);
+        const displayedData = expanded ? data : data.slice(0, 3);
+
+        return (
+            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex-1 min-w-[300px] flex flex-col">
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <div className={`p-1.5 rounded-lg ${colorClass} bg-opacity-10`}>
+                        <Icon className={`w-4 h-4 ${colorClass}`} />
                     </div>
-                ))}
+                    {title}
+                </h3>
+                <div className="space-y-3 flex-1">
+                    {/* Header */}
+                    <div className="flex text-xs font-medium text-gray-400 pb-2 border-b border-gray-50">
+                        <span className="w-8 text-center">排名</span>
+                        <span className="flex-1 px-2">热门问题 / 意向词</span>
+                        <span className="w-16 text-right">热度</span>
+                    </div>
+                    {/* Rows */}
+                    {displayedData.map((item, idx) => (
+                        <div key={idx} className="flex items-center text-sm group hover:bg-gray-50 p-1.5 rounded-lg transition-colors cursor-default">
+                            <span className={`w-8 text-center font-bold ${item.rank <= 3 ? 'text-red-500' : 'text-gray-400'}`}>
+                                {item.rank}
+                            </span>
+                            <div className="flex-1 px-2 min-w-0">
+                                <div className="font-medium text-gray-800 truncate" title={item.question}>
+                                    {item.question}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                                    <Search className="w-3 h-3 text-gray-300" />
+                                    {item.keyword}
+                                </div>
+                            </div>
+                            <div className="w-16 text-right font-medium text-orange-500 flex items-center justify-end gap-1">
+                                <Flame className="w-3 h-3" />
+                                {(item.heat / 1000).toFixed(1)}k
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                
+                {/* Expand/Collapse Button */}
+                {data.length > 3 && (
+                    <div className="mt-4 pt-2 border-t border-gray-50 text-center">
+                        <button 
+                            onClick={() => setExpanded(!expanded)}
+                            className="text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 w-full py-1 transition-colors"
+                        >
+                            {expanded ? (
+                                <>收起 <ChevronUp className="w-3 h-3" /></>
+                            ) : (
+                                <>查看更多 ({data.length - 3}) <ChevronDown className="w-3 h-3" /></>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="space-y-6 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
