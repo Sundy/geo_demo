@@ -14,6 +14,8 @@ import HotWordsAnalysis from '../components/HotWordsAnalysis';
 import MentionRateAnalysis from '../components/MentionRateAnalysis';
 import SentimentAnalysis from '../components/SentimentAnalysis';
 import SourceAnalysis from '../components/SourceAnalysis';
+import BrandAssetRadar from '../components/BrandAssetRadar';
+import SectionCard from '../components/SectionCard';
 
 const InsightDiagnosis: React.FC = () => {
     // Filter States
@@ -339,31 +341,68 @@ const InsightDiagnosis: React.FC = () => {
                 ))}
             </div>
 
+            {/* Brand Asset Diagnosis (Moved Here) */}
+            <SectionCard 
+                title="品牌资产诊断 (Brand Asset Diagnosis)" 
+                icon={Target} 
+                colorClass="text-indigo-600"
+            >
+                <BrandAssetRadar brandName={selectedBrand} />
+            </SectionCard>
+
             {/* 1. AI Search Heat Analysis (New Section) */}
-            <SearchHeatAnalysis brandName={selectedBrand} timeRange={timeRange} />
+            <SectionCard 
+                title="AI搜索热度洞察 (Search Heat Insights)" 
+                icon={Activity} 
+                colorClass="text-orange-500"
+                rightElement={
+                    <span className="text-sm text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded text-xs">
+                        统计周期: {timeRange}
+                    </span>
+                }
+            >
+                <SearchHeatAnalysis brandName={selectedBrand} timeRange={timeRange} />
+                <div className="mt-8 pt-8 border-t border-gray-100">
+                    <HotWordsAnalysis brandName={selectedBrand} />
+                </div>
+            </SectionCard>
 
-            {/* 2. Hot Words Analysis (New Section) */}
-            <HotWordsAnalysis brandName={selectedBrand} />
+            {/* 2. AI Mention Rate Analysis (New Section) */}
+            <SectionCard 
+                title="AI提及率分析 (Mention Rate Analysis)" 
+                icon={MessageCircle} 
+                colorClass="text-blue-600"
+            >
+                <MentionRateAnalysis brandName={selectedBrand} />
+            </SectionCard>
 
-            {/* 3. AI Mention Rate Analysis (New Section) */}
-            <MentionRateAnalysis brandName={selectedBrand} />
-
-            {/* 4. Sentiment Analysis (New Section) */}
-            <SentimentAnalysis brandName={selectedBrand} />
+            {/* 3. Sentiment Analysis (New Section) */}
+            <SectionCard 
+                title="情感度分析 (Sentiment Analysis)" 
+                icon={ThumbsUp} 
+                colorClass="text-green-500"
+            >
+                <SentimentAnalysis brandName={selectedBrand} />
+            </SectionCard>
 
             {/* 5. Source Analysis (New Section) */}
-            <SourceAnalysis brandName={selectedBrand} />
+            <SectionCard 
+                title="信源分析 (Source Analysis)" 
+                icon={Globe} 
+                colorClass="text-purple-600"
+            >
+                <SourceAnalysis brandName={selectedBrand} />
+            </SectionCard>
 
             {/* Global Analysis Charts (All migrated, keeping component for any future needs or remove) */}
             <InsightCharts brandName={selectedBrand} />
 
             {/* GEO Optimization Recommendations */}
-            <div className="p-6 border-t border-gray-100 bg-white">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-yellow-500" />
-                    推荐品牌GEO优化方案 (Recommended GEO Strategy)
-                </h3>
-                
+            <SectionCard 
+                title="推荐品牌GEO优化方案 (Recommended GEO Strategy)" 
+                icon={Lightbulb} 
+                colorClass="text-yellow-500"
+            >
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Left: Optimization List */}
                     <div className="space-y-4">
@@ -442,7 +481,7 @@ const InsightDiagnosis: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </SectionCard>
         </div>
     );
 };

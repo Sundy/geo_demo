@@ -234,21 +234,11 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
 
                 {/* Trend Chart - Refined Style */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex items-start justify-between mb-2">
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <div className="w-2 h-2 bg-blue-500 rounded-sm"></div>
-                                <span className="font-bold text-gray-800 text-sm">{brandName}</span>
-                            </div>
-                            <div className="text-xs text-gray-500 flex items-center gap-2">
-                                <span>同比 <span className="text-green-500">+155.41%</span></span>
-                                <span className="w-px h-3 bg-gray-300"></span>
-                                <span>环比 <span className="text-green-500">+77.38%</span></span>
-                            </div>
-                            <div className="text-xs text-gray-400 mt-1">
-                                平均值 {(avgHeat / 1000).toFixed(1)}万
-                            </div>
-                        </div>
+                    <div className="flex items-start justify-between mb-6">
+                        <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-purple-500" />
+                            热门周期 (Popular Cycle)
+                        </h3>
                         
                         {/* Time Unit Toggle */}
                         <div className="flex bg-gray-100 rounded-lg p-1">
@@ -270,6 +260,21 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                             >
                                 按月
                             </button>
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="w-2 h-2 bg-blue-500 rounded-sm"></div>
+                            <span className="font-bold text-gray-800 text-sm">{brandName}</span>
+                        </div>
+                        <div className="text-xs text-gray-500 flex items-center gap-2">
+                            <span>同比 <span className="text-green-500">+155.41%</span></span>
+                            <span className="w-px h-3 bg-gray-300"></span>
+                            <span>环比 <span className="text-green-500">+77.38%</span></span>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">
+                            平均值 {(avgHeat / 1000).toFixed(1)}万
                         </div>
                     </div>
 
