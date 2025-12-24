@@ -321,41 +321,7 @@ const DataMonitoring: React.FC = () => {
                                 </button>
                             </div>
 
-                            <div className="w-px h-6 bg-gray-200"></div>
 
-                            {/* Time Range */}
-                            <div className="flex gap-2">
-                                {['7d', '30d', 'custom'].map((range) => (
-                                    <button 
-                                        key={range}
-                                        onClick={() => setTimeRange(range as any)}
-                                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
-                                            timeRange === range 
-                                            ? 'bg-red-50 text-red-600 border border-red-100' 
-                                            : 'text-gray-600 hover:bg-gray-50 border border-transparent'
-                                        }`}
-                                    >
-                                        {range === '7d' ? '近7天' : range === '30d' ? '近30天' : '自定义'}
-                                    </button>
-                                ))}
-                                {timeRange === 'custom' && (
-                                    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300 ml-2">
-                                        <input 
-                                            type="date" 
-                                            value={customStartDate}
-                                            onChange={(e) => setCustomStartDate(e.target.value)}
-                                            className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:border-red-300 focus:ring-2 focus:ring-red-50"
-                                        />
-                                        <span className="text-gray-400">-</span>
-                                        <input 
-                                            type="date" 
-                                            value={customEndDate}
-                                            onChange={(e) => setCustomEndDate(e.target.value)}
-                                            className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:border-red-300 focus:ring-2 focus:ring-red-50"
-                                        />
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -436,20 +402,59 @@ const DataMonitoring: React.FC = () => {
                         <h3 className="text-lg font-bold text-gray-800">意图渗透率趋势 (Intent Penetration)</h3>
                         <p className="text-sm text-gray-500">核心意图：{currentPlan?.coreIntent}</p>
                     </div>
-                    <div className="flex gap-2">
-                        {['day', 'week', 'month'].map((scale) => (
-                            <button 
-                                key={scale}
-                                onClick={() => setChartTimeScale(scale as any)}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                                    chartTimeScale === scale 
-                                    ? 'bg-gray-900 text-white' 
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
-                            >
-                                {scale === 'day' ? '日' : scale === 'week' ? '周' : '月'}
-                            </button>
-                        ))}
+                    <div className="flex flex-wrap items-center gap-3 justify-end">
+                        {/* Time Range */}
+                        <div className="flex items-center gap-2">
+                            {['7d', '30d', 'custom'].map((range) => (
+                                <button 
+                                    key={range}
+                                    onClick={() => setTimeRange(range as any)}
+                                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
+                                        timeRange === range 
+                                        ? 'bg-red-50 text-red-600 border border-red-100' 
+                                        : 'text-gray-600 hover:bg-gray-50 border border-transparent'
+                                    }`}
+                                >
+                                    {range === '7d' ? '近7天' : range === '30d' ? '近30天' : '自定义'}
+                                </button>
+                            ))}
+                        </div>
+
+                        {timeRange === 'custom' && (
+                            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
+                                <input 
+                                    type="date" 
+                                    value={customStartDate}
+                                    onChange={(e) => setCustomStartDate(e.target.value)}
+                                    className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:border-red-300 focus:ring-2 focus:ring-red-50"
+                                />
+                                <span className="text-gray-400">-</span>
+                                <input 
+                                    type="date" 
+                                    value={customEndDate}
+                                    onChange={(e) => setCustomEndDate(e.target.value)}
+                                    className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:border-red-300 focus:ring-2 focus:ring-red-50"
+                                />
+                            </div>
+                        )}
+
+                        <div className="w-px h-6 bg-gray-200 mx-1"></div>
+
+                        <div className="flex gap-2">
+                            {['day', 'week', 'month'].map((scale) => (
+                                <button 
+                                    key={scale}
+                                    onClick={() => setChartTimeScale(scale as any)}
+                                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                                        chartTimeScale === scale 
+                                        ? 'bg-gray-900 text-white' 
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    {scale === 'day' ? '日' : scale === 'week' ? '周' : '月'}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
                 

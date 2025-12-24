@@ -23,24 +23,18 @@ const BrandAssetRadar: React.FC<BrandAssetRadarProps> = ({ brandName = '小鹏' 
 
     // Mock Data for Radar Chart
     const radarData = [
-        { subject: 'AI搜索热度', brand: 85, 特斯拉: 92, 理想: 88, 蔚来: 82, 小米: 95, 极氪: 78, fullMark: 100 },
-        { subject: 'AI搜索引擎流量监测', brand: 78, 特斯拉: 90, 理想: 85, 蔚来: 75, 小米: 92, 极氪: 70, fullMark: 100 },
-        { subject: '品牌AI情感度监测', brand: 92, 特斯拉: 85, 理想: 88, 蔚来: 90, 小米: 82, 极氪: 85, fullMark: 100 },
-        { subject: '品牌AI知名度监测', brand: 80, 特斯拉: 98, 理想: 85, 蔚来: 88, 小米: 95, 极氪: 75, fullMark: 100 },
-        { subject: '引用来源监测', brand: 85, 特斯拉: 88, 理想: 82, 蔚来: 85, 小米: 80, 极氪: 78, fullMark: 100 },
+        { subject: 'AI搜索热度', brand: 75, 特斯拉: 98, 理想: 70, 蔚来: 45, 小米: 95, 极氪: 40, fullMark: 100 },
+        { subject: 'AI搜索引擎流量监测', brand: 65, 特斯拉: 92, 理想: 60, 蔚来: 35, 小米: 98, 极氪: 30, fullMark: 100 },
+        { subject: '品牌AI情感度监测', brand: 92, 特斯拉: 50, 理想: 80, 蔚来: 95, 小米: 45, 极氪: 75, fullMark: 100 },
+        { subject: '品牌AI知名度监测', brand: 70, 特斯拉: 100, 理想: 85, 蔚来: 80, 小米: 98, 极氪: 55, fullMark: 100 },
+        { subject: '引用来源监测', brand: 90, 特斯拉: 70, 理想: 60, 蔚来: 80, 小米: 50, 极氪: 85, fullMark: 100 },
     ];
 
     const toggleCompetitor = (compName: string) => {
         if (selectedCompetitors.includes(compName)) {
             setSelectedCompetitors(selectedCompetitors.filter(c => c !== compName));
         } else {
-            if (selectedCompetitors.length < 3) {
-                setSelectedCompetitors([...selectedCompetitors, compName]);
-            } else {
-                // Optional: Show max limit warning or replace last one
-                // For now, just simple replace logic or limit
-                // Let's limit to 3 for clarity
-            }
+            setSelectedCompetitors([...selectedCompetitors, compName]);
         }
     };
 

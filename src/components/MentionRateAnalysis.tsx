@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-    BarChart, Bar, Cell, AreaChart, Area
+    BarChart, Bar, Cell, AreaChart, Area, LabelList
 } from 'recharts';
 import { MessageCircle, TrendingUp, Award, PieChart, ArrowUp, ArrowDown, BarChart2 } from 'lucide-react';
 
@@ -10,7 +10,9 @@ interface MentionRateAnalysisProps {
 }
 
 const MentionRateAnalysis: React.FC<MentionRateAnalysisProps> = ({ brandName = '小鹏' }) => {
-    const [trendTimeFilter, setTrendTimeFilter] = useState<'day' | 'week' | 'month'>('day');
+    const [trendTimeFilter, setTrendTimeFilter] = useState<'7d' | '30d' | '6m' | 'custom'>('7d');
+    const [customStartDate, setCustomStartDate] = useState('');
+    const [customEndDate, setCustomEndDate] = useState('');
 
     // 1. Metrics Data
     const metrics = [
@@ -44,42 +46,37 @@ const MentionRateAnalysis: React.FC<MentionRateAnalysisProps> = ({ brandName = '
             color: 'text-purple-600',
             bg: 'bg-purple-50'
         },
-        { 
-            title: '提及份额 (SOV)', 
-            subtitle: 'Share of Voice',
-            value: '15.2%', 
-            change: '-0.4%', 
-            isPositive: false,
-            icon: PieChart,
-            color: 'text-orange-600',
-            bg: 'bg-orange-50'
-        },
     ];
 
     // 2. Trend Data (Mock)
     const trendDataMap = {
-        day: [
-            { date: '12-16', brand: 4.2, comp1: 3.8, comp2: 5.1 },
-            { date: '12-17', brand: 4.5, comp1: 3.9, comp2: 4.8 },
-            { date: '12-18', brand: 4.8, comp1: 4.1, comp2: 4.5 },
-            { date: '12-19', brand: 5.2, comp1: 4.0, comp2: 4.2 },
-            { date: '12-20', brand: 4.9, comp1: 4.2, comp2: 4.6 },
-            { date: '12-21', brand: 4.7, comp1: 4.3, comp2: 4.9 },
-            { date: '12-22', brand: 5.0, comp1: 4.1, comp2: 4.7 },
+        '7d': [
+            { date: '12-16', brand: 4.2, comp1: 6.5, comp2: 5.8, comp3: 4.2, comp4: 3.5, comp5: 3.0 },
+            { date: '12-17', brand: 4.6, comp1: 6.2, comp2: 5.5, comp3: 4.8, comp4: 3.8, comp5: 3.2 },
+            { date: '12-18', brand: 5.1, comp1: 5.8, comp2: 5.2, comp3: 4.5, comp4: 5.5, comp5: 3.1 },
+            { date: '12-19', brand: 5.5, comp1: 5.5, comp2: 4.8, comp3: 5.0, comp4: 5.0, comp5: 3.3 },
+            { date: '12-20', brand: 5.9, comp1: 5.2, comp2: 4.5, comp3: 4.7, comp4: 4.5, comp5: 3.2 },
+            { date: '12-21', brand: 6.3, comp1: 4.8, comp2: 4.2, comp3: 4.9, comp4: 4.2, comp5: 3.4 },
+            { date: '12-22', brand: 6.8, comp1: 4.5, comp2: 4.0, comp3: 4.8, comp4: 4.0, comp5: 3.5 },
         ],
-        week: [
-            { date: 'Week 48', brand: 4.1, comp1: 3.5, comp2: 4.8 },
-            { date: 'Week 49', brand: 4.3, comp1: 3.7, comp2: 4.6 },
-            { date: 'Week 50', brand: 4.5, comp1: 3.8, comp2: 4.5 },
-            { date: 'Week 51', brand: 4.7, comp1: 4.0, comp2: 4.3 },
-            { date: 'Week 52', brand: 4.8, comp1: 4.1, comp2: 4.2 },
+        '30d': [
+            { date: 'Week 48', brand: 3.8, comp1: 6.8, comp2: 5.5, comp3: 4.0, comp4: 3.2, comp5: 2.8 },
+            { date: 'Week 49', brand: 4.5, comp1: 6.2, comp2: 5.2, comp3: 4.5, comp4: 3.8, comp5: 3.0 },
+            { date: 'Week 50', brand: 5.4, comp1: 5.6, comp2: 4.8, comp3: 5.2, comp4: 4.5, comp5: 3.2 },
+            { date: 'Week 51', brand: 6.2, comp1: 5.0, comp2: 4.5, comp3: 4.8, comp4: 5.2, comp5: 3.4 },
+            { date: 'Week 52', brand: 7.1, comp1: 4.4, comp2: 4.2, comp3: 5.0, comp4: 4.8, comp5: 3.6 },
         ],
-        month: [
-            { date: '2024-08', brand: 3.8, comp1: 3.2, comp2: 5.5 },
-            { date: '2024-09', brand: 4.0, comp1: 3.4, comp2: 5.2 },
-            { date: '2024-10', brand: 4.2, comp1: 3.6, comp2: 4.9 },
-            { date: '2024-11', brand: 4.5, comp1: 3.8, comp2: 4.6 },
-            { date: '2024-12', brand: 4.7, comp1: 4.0, comp2: 4.4 },
+        '6m': [
+            { date: '2024-08', brand: 3.2, comp1: 7.5, comp2: 6.0, comp3: 3.8, comp4: 2.5, comp5: 2.5 },
+            { date: '2024-09', brand: 4.1, comp1: 6.8, comp2: 5.8, comp3: 4.2, comp4: 3.5, comp5: 2.8 },
+            { date: '2024-10', brand: 5.0, comp1: 6.0, comp2: 5.2, comp3: 4.8, comp4: 4.5, comp5: 3.2 },
+            { date: '2024-11', brand: 6.2, comp1: 5.2, comp2: 4.8, comp3: 5.5, comp4: 5.2, comp5: 3.5 },
+            { date: '2024-12', brand: 7.5, comp1: 4.5, comp2: 4.2, comp3: 5.2, comp4: 4.8, comp5: 3.8 },
+        ],
+        'custom': [
+            { date: '12-10', brand: 4.0, comp1: 6.0, comp2: 5.0, comp3: 4.2, comp4: 3.5, comp5: 3.0 },
+            { date: '12-11', brand: 4.8, comp1: 5.5, comp2: 4.8, comp3: 4.5, comp4: 4.0, comp5: 3.2 },
+            { date: '12-12', brand: 5.6, comp1: 5.0, comp2: 4.5, comp3: 4.8, comp4: 4.5, comp5: 3.4 },
         ]
     };
 
@@ -100,7 +97,7 @@ const MentionRateAnalysis: React.FC<MentionRateAnalysisProps> = ({ brandName = '
             {/* Section Header */}
 
             {/* 1. Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {metrics.map((metric, index) => (
                     <div key={index} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-start justify-between hover:shadow-md transition-shadow">
                         <div>
@@ -132,20 +129,40 @@ const MentionRateAnalysis: React.FC<MentionRateAnalysisProps> = ({ brandName = '
                             AI提及率趋势 (Mention Trend)
                         </h3>
                         {/* Time Filter */}
-                        <div className="flex bg-gray-100 rounded-lg p-1">
-                            {(['day', 'week', 'month'] as const).map((t) => (
-                                <button
-                                    key={t}
-                                    onClick={() => setTrendTimeFilter(t)}
-                                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                                        trendTimeFilter === t 
-                                        ? 'bg-white text-blue-600 shadow-sm' 
-                                        : 'text-gray-500 hover:text-gray-700'
-                                    }`}
-                                >
-                                    {t === 'day' ? '日' : t === 'week' ? '周' : '月'}
-                                </button>
-                            ))}
+                        <div className="flex items-center gap-2">
+                            <div className="flex bg-gray-100 rounded-lg p-1">
+                                {(['7d', '30d', '6m', 'custom'] as const).map((t) => (
+                                    <button
+                                        key={t}
+                                        onClick={() => setTrendTimeFilter(t)}
+                                        className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                                            trendTimeFilter === t 
+                                            ? 'bg-white text-blue-600 shadow-sm' 
+                                            : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                    >
+                                        {t === '7d' ? '近7天' : t === '30d' ? '近30天' : t === '6m' ? '近半年' : '自定义'}
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            {trendTimeFilter === 'custom' && (
+                                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
+                                    <input 
+                                        type="date" 
+                                        value={customStartDate}
+                                        onChange={(e) => setCustomStartDate(e.target.value)}
+                                        className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-50"
+                                    />
+                                    <span className="text-gray-400">-</span>
+                                    <input 
+                                        type="date" 
+                                        value={customEndDate}
+                                        onChange={(e) => setCustomEndDate(e.target.value)}
+                                        className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-50"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="h-[300px] w-full">
@@ -171,7 +188,7 @@ const MentionRateAnalysis: React.FC<MentionRateAnalysisProps> = ({ brandName = '
                                     type="monotone" 
                                     dataKey="comp1" 
                                     name="特斯拉"
-                                    stroke="#9ca3af" 
+                                    stroke="#4b5563" 
                                     strokeWidth={2} 
                                     strokeDasharray="5 5"
                                     dot={false}
@@ -180,7 +197,34 @@ const MentionRateAnalysis: React.FC<MentionRateAnalysisProps> = ({ brandName = '
                                     type="monotone" 
                                     dataKey="comp2" 
                                     name="理想"
-                                    stroke="#f59e0b" 
+                                    stroke="#d97706" 
+                                    strokeWidth={2} 
+                                    strokeDasharray="5 5"
+                                    dot={false}
+                                />
+                                <Line 
+                                    type="monotone" 
+                                    dataKey="comp3" 
+                                    name="蔚来"
+                                    stroke="#059669" 
+                                    strokeWidth={2} 
+                                    strokeDasharray="5 5"
+                                    dot={false}
+                                />
+                                <Line 
+                                    type="monotone" 
+                                    dataKey="comp4" 
+                                    name="小米"
+                                    stroke="#e11d48" 
+                                    strokeWidth={2} 
+                                    strokeDasharray="5 5"
+                                    dot={false}
+                                />
+                                <Line 
+                                    type="monotone" 
+                                    dataKey="comp5" 
+                                    name="极氪"
+                                    stroke="#7c3aed" 
                                     strokeWidth={2} 
                                     strokeDasharray="5 5"
                                     dot={false}
@@ -194,7 +238,7 @@ const MentionRateAnalysis: React.FC<MentionRateAnalysisProps> = ({ brandName = '
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
                         <BarChart2 className="w-5 h-5 text-purple-600" />
-                        提及份额排名 (SOV Ranking)
+                        提及率排名 (Mention Rate Ranking)
                     </h3>
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -212,8 +256,15 @@ const MentionRateAnalysis: React.FC<MentionRateAnalysisProps> = ({ brandName = '
                                 <Tooltip 
                                     cursor={{ fill: '#f9fafb' }}
                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    formatter={(value: number) => [`${value}%`, '提及率']}
                                 />
                                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                                    <LabelList 
+                                        dataKey="value" 
+                                        position="right" 
+                                        formatter={(val: any) => `${val}%`} 
+                                        style={{ fill: '#6b7280', fontSize: '12px', fontWeight: 500 }} 
+                                    />
                                     {rankingData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.isMe ? '#2563eb' : '#e5e7eb'} />
                                     ))}

@@ -22,6 +22,9 @@ const HotWordsAnalysis: React.FC<HotWordsAnalysisProps> = ({ brandName = '小鹏
     // Mock Data Generator
     const generateWords = (): HotWord[] => {
         const words = [
+            // Center Node (Brand)
+            { id: 'center', text: brandName, value: 100, distance: 0, angle: 0, color: '#3b82f6', type: 'neutral' },
+
             // Inner Circle (High Relevance)
             { id: '1', text: 'G6性价比', value: 85, distance: 25, angle: 45, color: '#ef4444', type: 'positive' },
             { id: '2', text: 'XNGP智驾', value: 80, distance: 30, angle: 120, color: '#ef4444', type: 'positive' },
@@ -106,7 +109,6 @@ const HotWordsAnalysis: React.FC<HotWordsAnalysisProps> = ({ brandName = '小鹏
                     {/* Axis Labels */}
                     <div className="absolute w-full flex justify-between px-10 text-xs font-medium text-blue-300">
                         <span>弱 (Weak)</span>
-                        <span className="bg-white px-2 z-10">相关性 (Relevance)</span>
                         <span>弱 (Weak)</span>
                     </div>
                     <div className="absolute w-full border-t border-dashed border-blue-200 opacity-30"></div>

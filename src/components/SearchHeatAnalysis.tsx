@@ -15,7 +15,9 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
     const navigate = useNavigate();
     
     // Trend Time Filter State (Defaults to 'day' to match 24H trend, but can be toggled)
-    const [trendUnit, setTrendUnit] = useState<'day' | 'week' | 'month'>('day');
+    const [trendUnit, setTrendUnit] = useState<'7d' | '30d' | '6m' | 'custom'>('7d');
+    const [customStartDate, setCustomStartDate] = useState('');
+    const [customEndDate, setCustomEndDate] = useState('');
 
     // 1. Mock Data for Lists
     const industryHotSearch = [
@@ -46,16 +48,44 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
     ];
 
     // 2. Mock Data for Charts
-    const cityData = [
-        { name: '上海', value: 92 }, { name: '北京', value: 78 }, { name: '深圳', value: 75 }, 
-        { name: '广州', value: 72 }, { name: '杭州', value: 58 }, { name: '成都', value: 55 },
-        { name: '苏州', value: 52 }, { name: '武汉', value: 48 }, { name: '南京', value: 45 },
-        { name: '重庆', value: 42 }, 
-    ];
+    const getCityData = () => {
+        if (trendUnit === '7d') {
+            return [
+                { name: '上海', value: 92 }, { name: '北京', value: 78 }, { name: '深圳', value: 75 }, 
+                { name: '广州', value: 72 }, { name: '杭州', value: 58 }, { name: '成都', value: 55 },
+                { name: '苏州', value: 52 }, { name: '武汉', value: 48 }, { name: '南京', value: 45 },
+                { name: '重庆', value: 42 }, 
+            ];
+        } else if (trendUnit === '30d') {
+            return [
+                { name: '上海', value: 95 }, { name: '北京', value: 88 }, { name: '深圳', value: 82 }, 
+                { name: '广州', value: 80 }, { name: '成都', value: 75 }, { name: '杭州', value: 72 },
+                { name: '武汉', value: 68 }, { name: '重庆', value: 65 }, { name: '西安', value: 60 },
+                { name: '苏州', value: 58 }, 
+            ];
+        } else if (trendUnit === 'custom') {
+            return [
+                { name: '上海', value: 85 }, { name: '北京', value: 75 }, { name: '深圳', value: 70 }, 
+                { name: '广州', value: 68 }, { name: '杭州', value: 55 }, { name: '南京', value: 50 },
+                { name: '成都', value: 48 }, { name: '武汉', value: 45 }, { name: '苏州', value: 42 },
+                { name: '长沙', value: 40 }, 
+            ];
+        } else {
+            // 6m
+            return [
+                { name: '上海', value: 98 }, { name: '北京', value: 95 }, { name: '深圳', value: 90 }, 
+                { name: '广州', value: 88 }, { name: '杭州', value: 85 }, { name: '成都', value: 82 },
+                { name: '苏州', value: 78 }, { name: '南京', value: 75 }, { name: '武汉', value: 72 },
+                { name: '西安', value: 70 }, 
+            ];
+        }
+    };
+
+    const cityData = getCityData();
 
     // Dynamic Trend Data based on Filter
     const getTrendData = () => {
-        if (trendUnit === 'day') {
+        if (trendUnit === '7d') {
             // Daily Granularity (e.g., last 10 days)
             return [
                 { time: '12-14', heat: 5200 }, { time: '12-15', heat: 5800 }, { time: '12-16', heat: 6100 },
@@ -63,7 +93,7 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                 { time: '12-20', heat: 9200 }, { time: '12-21', heat: 8800 }, { time: '12-22', heat: 7500 },
                 { time: '12-23', heat: 8100 },
             ];
-        } else if (trendUnit === 'week') {
+        } else if (trendUnit === '30d') {
             // Weekly Granularity (e.g., last 8 weeks) - Displaying start date of the week or Week Num
             return [
                 { time: '10.28-11.03', heat: 35000 }, 
@@ -74,6 +104,11 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                 { time: '12.02-12.08', heat: 48000 },
                 { time: '12.09-12.15', heat: 52000 },
                 { time: '12.16-12.22', heat: 55000 },
+            ];
+        } else if (trendUnit === 'custom') {
+            return [
+                { time: '12-10', heat: 5000 }, { time: '12-11', heat: 5200 }, { time: '12-12', heat: 5500 },
+                { time: '12-13', heat: 5300 }, { time: '12-14', heat: 5800 },
             ];
         } else {
             // Monthly Granularity (e.g., last 6 months)
@@ -91,23 +126,29 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
     const trendData = getTrendData();
     const avgHeat = Math.round(trendData.reduce((acc, curr) => acc + curr.heat, 0) / trendData.length);
 
-    // Custom Dot Component
+    // Custom Dot Component - Only show top 5
     const CustomDot = (props: any) => {
         const { cx, cy, stroke, payload, value } = props;
         
-        // Highlight logic: e.g., if heat is significantly higher than avg or specific points
-        const isHigh = value > avgHeat * 1.1;
-        const isLow = value < avgHeat * 0.9;
+        // Sort data by heat to find top 5 thresholds
+        const sortedData = [...trendData].sort((a, b) => b.heat - a.heat);
+        const top5Threshold = sortedData.length >= 5 ? sortedData[4].heat : 0;
         
-        if (isHigh || isLow) {
+        const isTop5 = value >= top5Threshold;
+        
+        if (isTop5) {
              return (
-                <svg x={cx - 6} y={cy - 6} width={12} height={12} fill="white" viewBox="0 0 12 12">
-                    <circle cx="6" cy="6" r="4" stroke={isHigh ? "#ef4444" : "#f59e0b"} strokeWidth="2" fill="white" />
-                    <circle cx="6" cy="6" r="6" stroke={isHigh ? "#ef4444" : "#f59e0b"} strokeWidth="2" fill="none" opacity="0.3" />
-                </svg>
+                <g>
+                    {/* Outer glow ring */}
+                    <circle cx={cx} cy={cy} r="10" stroke="#ef4444" strokeWidth="1" fill="none" opacity="0.3" />
+                    {/* Main ring */}
+                    <circle cx={cx} cy={cy} r="6" stroke="#ef4444" strokeWidth="2" fill="white" />
+                    {/* Inner solid dot */}
+                    <circle cx={cx} cy={cy} r="3" fill="#ef4444" />
+                </g>
             );
         }
-        return null; // Don't render default dots for normal points to keep it clean like the reference
+        return null; 
     };
 
     // Helper Component for List
@@ -192,68 +233,96 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                 />
             </div>
 
-            {/* Row 2: Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* City Chart */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-blue-500" />
-                        热门城市分布 (Top 10 Cities)
-                    </h3>
-                    <div className="h-[320px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={cityData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                <XAxis 
-                                    dataKey="name" 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    tick={{ fill: '#6b7280', fontSize: 10 }} 
-                                    interval={0}
-                                />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
-                                <Tooltip 
-                                    cursor={{ fill: '#f9fafb' }}
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                />
-                                <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} name="热度指数" />
-                            </BarChart>
-                        </ResponsiveContainer>
+            {/* Row 2: Charts Header & Content */}
+            <div className="flex flex-col gap-6">
+                {/* Global Filter for Charts */}
+                <div className="flex justify-end items-center">
+                    <div className="flex bg-gray-100 rounded-lg p-1">
+                        <button 
+                            onClick={() => setTrendUnit('7d')}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendUnit === '7d' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            近7天
+                        </button>
+                        <button 
+                            onClick={() => setTrendUnit('30d')}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendUnit === '30d' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            近30天
+                        </button>
+                        <button 
+                            onClick={() => setTrendUnit('6m')}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendUnit === '6m' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            近半年
+                        </button>
+                        <button 
+                            onClick={() => setTrendUnit('custom')}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendUnit === 'custom' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            自定义
+                        </button>
                     </div>
+                    
+                    {trendUnit === 'custom' && (
+                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300 ml-4">
+                            <input 
+                                type="date" 
+                                value={customStartDate}
+                                onChange={(e) => setCustomStartDate(e.target.value)}
+                                className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:border-purple-300 focus:ring-2 focus:ring-purple-50"
+                            />
+                            <span className="text-gray-400">-</span>
+                            <input 
+                                type="date" 
+                                value={customEndDate}
+                                onChange={(e) => setCustomEndDate(e.target.value)}
+                                className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-600 focus:outline-none focus:border-purple-300 focus:ring-2 focus:ring-purple-50"
+                            />
+                        </div>
+                    )}
                 </div>
 
-                {/* Trend Chart - Refined Style */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex items-start justify-between mb-6">
-                        <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-purple-500" />
-                            热门周期 (Popular Cycle)
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* City Chart */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <MapPin className="w-5 h-5 text-blue-500" />
+                            热门城市分布 (Top 10 Cities)
                         </h3>
-                        
-                        {/* Time Unit Toggle */}
-                        <div className="flex bg-gray-100 rounded-lg p-1">
-                            <button 
-                                onClick={() => setTrendUnit('day')}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendUnit === 'day' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                按日
-                            </button>
-                            <button 
-                                onClick={() => setTrendUnit('week')}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendUnit === 'week' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                按周
-                            </button>
-                            <button 
-                                onClick={() => setTrendUnit('month')}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${trendUnit === 'month' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                按月
-                            </button>
+                        <div className="h-[320px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={cityData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                    <XAxis 
+                                        dataKey="name" 
+                                        axisLine={false} 
+                                        tickLine={false} 
+                                        tick={{ fill: '#6b7280', fontSize: 10 }} 
+                                        interval={0}
+                                    />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
+                                    <Tooltip 
+                                        cursor={{ fill: '#f9fafb' }}
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} name="热度指数" />
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
 
-                    <div className="mb-4">
+                    {/* Trend Chart - Refined Style */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div className="flex items-start justify-between mb-6">
+                            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <Calendar className="w-5 h-5 text-purple-500" />
+                                热门周期 (Popular Cycle)
+                            </h3>
+                            {/* Filter removed from here */}
+                        </div>
+
+                        <div className="mb-4">
                         <div className="flex items-center gap-2 mb-1">
                             <div className="w-2 h-2 bg-blue-500 rounded-sm"></div>
                             <span className="font-bold text-gray-800 text-sm">{brandName}</span>
@@ -270,7 +339,13 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
 
                     <div className="h-[320px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={trendData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                            <AreaChart data={trendData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                                <defs>
+                                    <linearGradient id="colorHeat" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                                 <XAxis 
                                     dataKey="time" 
@@ -290,27 +365,22 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                                     formatter={(value: number) => [`${(value / 1000).toFixed(2)}万`, '热度']}
                                 />
                                 <ReferenceLine y={avgHeat} stroke="#93c5fd" strokeDasharray="3 3" label={{ position: 'right', value: `${(avgHeat/1000).toFixed(1)}万`, fill: '#3b82f6', fontSize: 10 }} />
-                                <Line 
+                                <Area 
                                     type="linear" 
                                     dataKey="heat" 
                                     stroke="#3b82f6" 
                                     strokeWidth={2} 
+                                    fill="url(#colorHeat)"
                                     dot={<CustomDot />}
                                     activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: 'white' }}
                                     name="搜索热度"
                                 />
-                                <Brush 
-                                    dataKey="time" 
-                                    height={30} 
-                                    stroke="#e5e7eb"
-                                    fill="#f9fafb"
-                                    tickFormatter={() => ''}
-                                />
-                            </LineChart>
+                            </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     );
 };

@@ -151,7 +151,7 @@ const InsightDiagnosis: React.FC = () => {
             },
             {
                 id: 'source_score',
-                title: '信源分数',
+                title: '信源分析',
                 value: baseSourceScore,
                 unit: '',
                 icon: Globe,
@@ -220,47 +220,7 @@ const InsightDiagnosis: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Right: Time Range */}
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
-                            <button 
-                                onClick={() => setTimeRange('近7天')}
-                                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${timeRange === '近7天' ? 'bg-red-50 text-red-600' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                近7天
-                            </button>
-                            <button 
-                                onClick={() => setTimeRange('近30天')}
-                                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${timeRange === '近30天' ? 'bg-red-50 text-red-600' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                近30天
-                            </button>
-                            <button 
-                                onClick={() => setTimeRange('自定义')}
-                                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${timeRange === '自定义' ? 'bg-red-50 text-red-600' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                自定义
-                            </button>
-                        </div>
-                        
-                        {timeRange === '自定义' && (
-                            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
-                                <input 
-                                    type="date" 
-                                    value={customStartDate}
-                                    onChange={(e) => setCustomStartDate(e.target.value)}
-                                    className="border border-gray-200 rounded-lg px-2 py-1 text-sm text-gray-600 focus:outline-none focus:border-red-300 focus:ring-2 focus:ring-red-50"
-                                />
-                                <span className="text-gray-400">-</span>
-                                <input 
-                                    type="date" 
-                                    value={customEndDate}
-                                    onChange={(e) => setCustomEndDate(e.target.value)}
-                                    className="border border-gray-200 rounded-lg px-2 py-1 text-sm text-gray-600 focus:outline-none focus:border-red-300 focus:ring-2 focus:ring-red-50"
-                                />
-                            </div>
-                        )}
-                    </div>
+
                 </div>
 
                 {/* Bottom: Platforms (New Line) */}
@@ -351,11 +311,7 @@ const InsightDiagnosis: React.FC = () => {
                 title="AI搜索热度洞察 (Search Heat Insights)" 
                 icon={Activity} 
                 colorClass="text-orange-500"
-                rightElement={
-                    <span className="text-sm text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded text-xs">
-                        统计周期: {timeRange}
-                    </span>
-                }
+                rightElement={null}
             >
                 <SearchHeatAnalysis brandName={selectedBrand} timeRange={timeRange} />
                 <div className="mt-8 pt-8 border-t border-gray-100">

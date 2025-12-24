@@ -17,7 +17,7 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
     const [activeKeywordTab, setActiveKeywordTab] = useState<'positive' | 'negative'>('negative');
     
     // Trend Time Filter State
-    const [trendTimeFilter, setTrendTimeFilter] = useState<'day' | 'week' | 'month'>('day');
+    const [trendTimeFilter, setTrendTimeFilter] = useState<'7d' | '30d' | '6m' | 'custom'>('7d');
 
     // Radar Platform Filter State
     const [radarPlatform, setRadarPlatform] = useState<string>('Average');
@@ -99,7 +99,7 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
 
     // 1. AI Mention Trend Data (Mock)
     const trendDataMap = {
-        day: [
+        '7d': [
             { date: '12-10', brand: 12 },
             { date: '12-11', brand: 15 },
             { date: '12-12', brand: 18 },
@@ -108,19 +108,24 @@ const InsightCharts: React.FC<InsightChartsProps> = ({ brandName = '小鹏' }) =
             { date: '12-15', brand: 25 },
             { date: '12-16', brand: 28 },
         ],
-        week: [
+        '30d': [
             { date: 'Week 46', brand: 45 },
             { date: 'Week 47', brand: 52 },
             { date: 'Week 48', brand: 48 },
             { date: 'Week 49', brand: 60 },
             { date: 'Week 50', brand: 65 },
         ],
-        month: [
+        '6m': [
             { date: '2024-08', brand: 180 },
             { date: '2024-09', brand: 210 },
             { date: '2024-10', brand: 195 },
             { date: '2024-11', brand: 230 },
             { date: '2024-12', brand: 250 },
+        ],
+        'custom': [
+            { date: '12-10', brand: 12 },
+            { date: '12-11', brand: 15 },
+            { date: '12-12', brand: 18 },
         ]
     };
 
