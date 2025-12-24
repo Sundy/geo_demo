@@ -342,13 +342,9 @@ const InsightDiagnosis: React.FC = () => {
             </div>
 
             {/* Brand Asset Diagnosis (Moved Here) */}
-            <SectionCard 
-                title="品牌资产诊断 (Brand Asset Diagnosis)" 
-                icon={Target} 
-                colorClass="text-indigo-600"
-            >
                 <BrandAssetRadar brandName={selectedBrand} />
-            </SectionCard>
+                <br/>
+            
 
             {/* 1. AI Search Heat Analysis (New Section) */}
             <SectionCard 

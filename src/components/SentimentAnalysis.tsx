@@ -145,20 +145,13 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ brandName = '小�
     return (
         <div className="space-y-6 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Section Header */}
-            <div className="flex items-center gap-2 mb-2">
-                <div className="h-6 w-1 bg-green-500 rounded-full"></div>
-                <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <PieChartIcon className="w-5 h-5 text-green-500" />
-                    情感度分析 (Sentiment Analysis)
-                </h2>
-            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Sentiment Distribution */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
                         <PieChartIcon className="w-5 h-5 text-red-600" />
-                        品牌情绪分布 (Sentiment Distribution)
+                        品牌情绪分布
                     </h3>
                     <div className="flex flex-col items-center h-[300px]">
                         <div className="w-full h-[200px]">

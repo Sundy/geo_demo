@@ -103,13 +103,7 @@ const SourceAnalysis: React.FC<SourceAnalysisProps> = ({ brandName = '小鹏' })
     return (
         <div className="space-y-6 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Section Header */}
-            <div className="flex items-center gap-2 mb-2">
-                <div className="h-6 w-1 bg-purple-600 rounded-full"></div>
-                <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-purple-600" />
-                    信源分析 (Source Analysis)
-                </h2>
-            </div>
+
 
             {/* Metrics & Trend Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -55,7 +55,7 @@ const BrandAssetRadar: React.FC<BrandAssetRadarProps> = ({ brandName = '小鹏' 
                 <div>
                     <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                         <Hexagon className="w-5 h-5 text-indigo-600" />
-                        数字品牌资产雷达 (Digital Brand Assets)
+                        品牌AI资产 (AI Brand Assets)
                     </h3>
                     <p className="text-xs text-gray-500 mt-1 ml-7">
                         对比维度：{brandName} vs 竞品 ({selectedCompetitors.length})
