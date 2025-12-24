@@ -12,6 +12,7 @@ import RealtimeSearch from './pages/RealtimeSearch';
 import QualificationsHonors from './pages/QualificationsHonors';
 import WebsiteHome from './website/pages/Home';
 import Login from './pages/Login';
+import SearchDetail from './pages/SearchDetail';
 
 const App: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const App: React.FC = () => {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Navigate to="/insight" replace />} />
           <Route path="insight" element={<InsightDiagnosis />} />
+          <Route path="insight/search-detail" element={<SearchDetail />} />
           <Route path="intent" element={<SearchIntent />} />
           <Route path="content" element={<ContentStrategy />} />
           <Route path="knowledge" element={<KnowledgeBase />} />

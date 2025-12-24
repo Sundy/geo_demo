@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-    LineChart, Line, Legend 
+    LineChart, Line, Legend, Brush, ReferenceLine, AreaChart, Area
 } from 'recharts';
-import { Activity, Flame, Search, MapPin, Calendar, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
+import { Activity, Flame, Search, MapPin, Calendar, TrendingUp, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchHeatAnalysisProps {
     brandName?: string;
@@ -11,6 +12,7 @@ interface SearchHeatAnalysisProps {
 }
 
 const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '小鹏', timeRange = '近7天' }) => {
+    const navigate = useNavigate();
     
     // Trend Time Filter State (Defaults to 'day' to match 24H trend, but can be toggled)
     const [trendUnit, setTrendUnit] = useState<'day' | 'week' | 'month'>('day');
@@ -45,13 +47,10 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
 
     // 2. Mock Data for Charts
     const cityData = [
-        { name: '上海', value: 92 }, { name: '北京', value: 88 }, { name: '深圳', value: 85 }, 
-        { name: '广州', value: 82 }, { name: '杭州', value: 78 }, { name: '成都', value: 75 },
-        { name: '苏州', value: 72 }, { name: '武汉', value: 68 }, { name: '南京', value: 65 },
-        { name: '重庆', value: 62 }, { name: '西安', value: 58 }, { name: '天津', value: 55 },
-        { name: '长沙', value: 52 }, { name: '郑州', value: 50 }, { name: '宁波', value: 48 },
-        { name: '青岛', value: 45 }, { name: '合肥', value: 42 }, { name: '东莞', value: 40 },
-        { name: '佛山', value: 38 }, { name: '无锡', value: 35 },
+        { name: '上海', value: 92 }, { name: '北京', value: 78 }, { name: '深圳', value: 75 }, 
+        { name: '广州', value: 72 }, { name: '杭州', value: 58 }, { name: '成都', value: 55 },
+        { name: '苏州', value: 52 }, { name: '武汉', value: 48 }, { name: '南京', value: 45 },
+        { name: '重庆', value: 42 }, 
     ];
 
     // Dynamic Trend Data based on Filter
@@ -90,11 +89,31 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
     };
 
     const trendData = getTrendData();
+    const avgHeat = Math.round(trendData.reduce((acc, curr) => acc + curr.heat, 0) / trendData.length);
+
+    // Custom Dot Component
+    const CustomDot = (props: any) => {
+        const { cx, cy, stroke, payload, value } = props;
+        
+        // Highlight logic: e.g., if heat is significantly higher than avg or specific points
+        const isHigh = value > avgHeat * 1.1;
+        const isLow = value < avgHeat * 0.9;
+        
+        if (isHigh || isLow) {
+             return (
+                <svg x={cx - 6} y={cy - 6} width={12} height={12} fill="white" viewBox="0 0 12 12">
+                    <circle cx="6" cy="6" r="4" stroke={isHigh ? "#ef4444" : "#f59e0b"} strokeWidth="2" fill="white" />
+                    <circle cx="6" cy="6" r="6" stroke={isHigh ? "#ef4444" : "#f59e0b"} strokeWidth="2" fill="none" opacity="0.3" />
+                </svg>
+            );
+        }
+        return null; // Don't render default dots for normal points to keep it clean like the reference
+    };
 
     // Helper Component for List
     const SearchList = ({ title, icon: Icon, data, colorClass }: { title: string, icon: any, data: any[], colorClass: string }) => {
-        const [expanded, setExpanded] = useState(false);
-        const displayedData = expanded ? data : data.slice(0, 3);
+        // Only show top 3 items
+        const displayedData = data.slice(0, 3);
 
         return (
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex-1 min-w-[300px] flex flex-col">
@@ -134,21 +153,15 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                     ))}
                 </div>
                 
-                {/* Expand/Collapse Button */}
-                {data.length > 3 && (
-                    <div className="mt-4 pt-2 border-t border-gray-50 text-center">
-                        <button 
-                            onClick={() => setExpanded(!expanded)}
-                            className="text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 w-full py-1 transition-colors"
-                        >
-                            {expanded ? (
-                                <>收起 <ChevronUp className="w-3 h-3" /></>
-                            ) : (
-                                <>查看更多 ({data.length - 3}) <ChevronDown className="w-3 h-3" /></>
-                            )}
-                        </button>
-                    </div>
-                )}
+                {/* View More Button (Navigates to Detail Page) */}
+                <div className="mt-4 pt-2 border-t border-gray-50 text-center">
+                    <button 
+                        onClick={() => navigate('/insight/search-detail')}
+                        className="text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 w-full py-1 transition-colors"
+                    >
+                        查看更多 <ArrowRight className="w-3 h-3" />
+                    </button>
+                </div>
             </div>
         );
     };
@@ -195,9 +208,9 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
                         <MapPin className="w-5 h-5 text-blue-500" />
-                        热门城市分布 (Top 20 Cities)
+                        热门城市分布 (Top 10 Cities)
                     </h3>
-                    <div className="h-[300px] w-full">
+                    <div className="h-[320px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={cityData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -219,13 +232,24 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                     </div>
                 </div>
 
-                {/* Trend Chart */}
+                {/* Trend Chart - Refined Style */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-purple-500" />
-                            热门周期趋势 (Search Heat Trend)
-                        </h3>
+                    <div className="flex items-start justify-between mb-2">
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="w-2 h-2 bg-blue-500 rounded-sm"></div>
+                                <span className="font-bold text-gray-800 text-sm">{brandName}</span>
+                            </div>
+                            <div className="text-xs text-gray-500 flex items-center gap-2">
+                                <span>同比 <span className="text-green-500">+155.41%</span></span>
+                                <span className="w-px h-3 bg-gray-300"></span>
+                                <span>环比 <span className="text-green-500">+77.38%</span></span>
+                            </div>
+                            <div className="text-xs text-gray-400 mt-1">
+                                平均值 {(avgHeat / 1000).toFixed(1)}万
+                            </div>
+                        </div>
+                        
                         {/* Time Unit Toggle */}
                         <div className="flex bg-gray-100 rounded-lg p-1">
                             <button 
@@ -248,24 +272,44 @@ const SearchHeatAnalysis: React.FC<SearchHeatAnalysisProps> = ({ brandName = '�
                             </button>
                         </div>
                     </div>
-                    <div className="h-[300px] w-full">
+
+                    <div className="h-[320px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={trendData} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                            <LineChart data={trendData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
+                                <XAxis 
+                                    dataKey="time" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fill: '#9ca3af', fontSize: 11 }} 
+                                    dy={10}
+                                />
+                                <YAxis 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fill: '#9ca3af', fontSize: 11 }} 
+                                    tickFormatter={(value) => `${(value / 1000).toFixed(1)}万`}
+                                />
                                 <Tooltip 
                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    formatter={(value: number) => [`${(value / 1000).toFixed(2)}万`, '热度']}
                                 />
-                                <Legend />
+                                <ReferenceLine y={avgHeat} stroke="#93c5fd" strokeDasharray="3 3" label={{ position: 'right', value: `${(avgHeat/1000).toFixed(1)}万`, fill: '#3b82f6', fontSize: 10 }} />
                                 <Line 
-                                    type="monotone" 
+                                    type="linear" 
                                     dataKey="heat" 
-                                    stroke="#8b5cf6" 
-                                    strokeWidth={3} 
-                                    dot={{ r: 4, fill: '#8b5cf6', strokeWidth: 2, stroke: '#fff' }}
-                                    activeDot={{ r: 6 }}
+                                    stroke="#3b82f6" 
+                                    strokeWidth={2} 
+                                    dot={<CustomDot />}
+                                    activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: 'white' }}
                                     name="搜索热度"
+                                />
+                                <Brush 
+                                    dataKey="time" 
+                                    height={30} 
+                                    stroke="#e5e7eb"
+                                    fill="#f9fafb"
+                                    tickFormatter={() => ''}
                                 />
                             </LineChart>
                         </ResponsiveContainer>

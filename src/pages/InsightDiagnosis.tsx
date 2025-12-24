@@ -11,6 +11,9 @@ import InsightRegion from './tabs/InsightRegion';
 import InsightCharts from '../components/InsightCharts';
 import SearchHeatAnalysis from '../components/SearchHeatAnalysis';
 import HotWordsAnalysis from '../components/HotWordsAnalysis';
+import MentionRateAnalysis from '../components/MentionRateAnalysis';
+import SentimentAnalysis from '../components/SentimentAnalysis';
+import SourceAnalysis from '../components/SourceAnalysis';
 
 const InsightDiagnosis: React.FC = () => {
     // Filter States
@@ -332,23 +335,6 @@ const InsightDiagnosis: React.FC = () => {
                                 <span className="text-gray-400 ml-2">Weighted Score</span>
                             </div>
                         )}
-
-                        {/* Hover Tooltip for Sub-items */}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-64 bg-white shadow-xl rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none border border-gray-100 invisible group-hover:visible">
-                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 transform rotate-45"></div>
-                            <h4 className="font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-100 text-sm flex items-center gap-2">
-                                <metric.icon className="w-4 h-4 text-gray-500" />
-                                {metric.title}细分
-                            </h4>
-                            <div className="space-y-2">
-                                {metric.details.map((detail, idx) => (
-                                    <div key={idx} className="flex justify-between items-center text-sm">
-                                        <span className="text-gray-500">{detail.label}</span>
-                                        <span className="font-medium text-gray-800 truncate max-w-[120px]" title={String(detail.value)}>{detail.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 ))}
             </div>
@@ -359,173 +345,100 @@ const InsightDiagnosis: React.FC = () => {
             {/* 2. Hot Words Analysis (New Section) */}
             <HotWordsAnalysis brandName={selectedBrand} />
 
-            {/* Global Analysis Charts */}
+            {/* 3. AI Mention Rate Analysis (New Section) */}
+            <MentionRateAnalysis brandName={selectedBrand} />
+
+            {/* 4. Sentiment Analysis (New Section) */}
+            <SentimentAnalysis brandName={selectedBrand} />
+
+            {/* 5. Source Analysis (New Section) */}
+            <SourceAnalysis brandName={selectedBrand} />
+
+            {/* Global Analysis Charts (All migrated, keeping component for any future needs or remove) */}
             <InsightCharts brandName={selectedBrand} />
 
-            {/* Tabbed Content: Brand Search Questions & Weights */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-6 border-b border-gray-100">
-                    <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                        <MessageCircle className="w-6 h-6 text-red-600" />
-                        品牌搜索问题及权重 (Brand Search Questions & Weights)
-                    </h2>
-                    
-                    {/* Tab Navigation */}
-                    <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg w-fit">
-                        <button 
-                            onClick={() => setActiveTab('industry')}
-                            className={`
-                                flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
-                                ${activeTab === 'industry' 
-                                    ? 'bg-white text-red-600 shadow-sm' 
-                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                                }
-                            `}
-                        >
-                            <Globe className="w-4 h-4" />
-                            看行业 (Industry)
-                        </button>
-                        <button 
-                            onClick={() => setActiveTab('brand')}
-                            className={`
-                                flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
-                                ${activeTab === 'brand' 
-                                    ? 'bg-white text-red-600 shadow-sm' 
-                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                                }
-                            `}
-                        >
-                            <Layers className="w-4 h-4" />
-                            看品牌 (Brand)
-                        </button>
-                        <button 
-                            onClick={() => setActiveTab('competitor')}
-                            className={`
-                                flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
-                                ${activeTab === 'competitor' 
-                                    ? 'bg-white text-red-600 shadow-sm' 
-                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                                }
-                            `}
-                        >
-                            <Target className="w-4 h-4" />
-                            看竞品 (Competitor)
-                        </button>
-                        <button 
-                            onClick={() => setActiveTab('region')}
-                            className={`
-                                flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
-                                ${activeTab === 'region' 
-                                    ? 'bg-white text-red-600 shadow-sm' 
-                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                                }
-                            `}
-                        >
-                            <MapPin className="w-4 h-4" />
-                            看地域 (Region)
-                        </button>
-                    </div>
-                </div>
-
-                {/* Tab Content */}
-                <div className="p-6 bg-gray-50/50">
-                    {activeTab === 'industry' && (
-                        <InsightIndustry platform={platformDisplayString} onlyTable={true} />
-                    )}
-                    {activeTab === 'brand' && (
-                        <InsightBrand platform={platformDisplayString} onlyTable={true} />
-                    )}
-                    {activeTab === 'competitor' && (
-                        <InsightCompetitor platform={platformDisplayString} onlyTable={true} />
-                    )}
-                    {activeTab === 'region' && (
-                        <InsightRegion platform={platformDisplayString} onlyTable={true} />
-                    )}
-                </div>
-
-                {/* GEO Optimization Recommendations */}
-                <div className="p-6 border-t border-gray-100 bg-white">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <Lightbulb className="w-5 h-5 text-yellow-500" />
-                        推荐品牌GEO优化方案 (Recommended GEO Strategy)
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left: Optimization List */}
-                        <div className="space-y-4">
-                            <div className="bg-red-50 border border-red-100 rounded-lg p-4">
-                                <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
-                                    <AlertTriangle className="w-4 h-4" />
-                                    急需优化的负面/弱势问题
-                                </h4>
-                                <ul className="space-y-3">
-                                    <li className="flex items-start gap-2 text-sm text-gray-700">
-                                        <span className="bg-white text-red-600 px-2 py-0.5 rounded border border-red-200 text-xs font-bold shrink-0 mt-0.5">Top 1</span>
-                                        <div>
-                                            <span className="font-medium">小鹏G9内饰有没有异味？</span>
-                                            <p className="text-xs text-gray-500 mt-1">
-                                                <span className="font-medium text-red-500">负面处理：</span> 
-                                                需大量发布车主真实除味评测、权威机构甲醛检测报告，稀释早期负面权重。
-                                            </p>
-                                        </div>
-                                    </li>
-                                    <li className="flex items-start gap-2 text-sm text-gray-700">
-                                        <span className="bg-white text-red-600 px-2 py-0.5 rounded border border-red-200 text-xs font-bold shrink-0 mt-0.5">Top 2</span>
-                                        <div>
-                                            <span className="font-medium">小鹏P7i vs 小米SU7 续航实测谁更强？</span>
-                                            <p className="text-xs text-gray-500 mt-1">
-                                                <span className="font-medium text-red-500">竞品回击：</span> 
-                                                重点布局“真实工况达成率”对比内容，强调XNGP在长途续航中的节能优势。
-                                            </p>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                                <h4 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
-                                    <Target className="w-4 h-4" />
-                                    建议抢占的高热度意图词
-                                </h4>
-                                <div className="flex flex-wrap gap-2">
-                                    <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200 shadow-sm">
-                                        20万级纯电SUV性价比
-                                    </span>
-                                    <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200 shadow-sm">
-                                        800V高压快充车型
-                                    </span>
-                                    <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200 shadow-sm">
-                                        上海新能源牌照政策2025
-                                    </span>
-                                    <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200 shadow-sm">
-                                        高速NGP真实体验
-                                    </span>
-                                </div>
-                            </div>
+            {/* GEO Optimization Recommendations */}
+            <div className="p-6 border-t border-gray-100 bg-white">
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5 text-yellow-500" />
+                    推荐品牌GEO优化方案 (Recommended GEO Strategy)
+                </h3>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Left: Optimization List */}
+                    <div className="space-y-4">
+                        <div className="bg-red-50 border border-red-100 rounded-lg p-4">
+                            <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4" />
+                                急需优化的负面/弱势问题
+                            </h4>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-2 text-sm text-gray-700">
+                                    <span className="bg-white text-red-600 px-2 py-0.5 rounded border border-red-200 text-xs font-bold shrink-0 mt-0.5">Top 1</span>
+                                    <div>
+                                        <span className="font-medium">小鹏G9内饰有没有异味？</span>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            <span className="font-medium text-red-500">负面处理：</span> 
+                                            需大量发布车主真实除味评测、权威机构甲醛检测报告，稀释早期负面权重。
+                                        </p>
+                                    </div>
+                                </li>
+                                <li className="flex items-start gap-2 text-sm text-gray-700">
+                                    <span className="bg-white text-red-600 px-2 py-0.5 rounded border border-red-200 text-xs font-bold shrink-0 mt-0.5">Top 2</span>
+                                    <div>
+                                        <span className="font-medium">小鹏P7i vs 小米SU7 续航实测谁更强？</span>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            <span className="font-medium text-red-500">竞品回击：</span> 
+                                            重点布局“真实工况达成率”对比内容，强调XNGP在长途续航中的节能优势。
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
 
-                        {/* Right: Strategy Analysis */}
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-5">
-                            <h4 className="font-semibold text-gray-800 mb-3">综合策略分析</h4>
-                            <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
-                                <p>
-                                    <span className="font-bold text-gray-800">1. 扬长避短，强化智驾标签：</span>
-                                    当前品牌在“智能驾驶”相关问题中排名第一，应继续巩固。针对“续航里程”等竞品强势领域，建议避开直接参数对比，转而强调“扎实续航”和“充电速度”的差异化优势。
-                                </p>
-                                <p>
-                                    <span className="font-bold text-gray-800">2. 地域精准渗透：</span>
-                                    在“上海”、“深圳”等政策导向型城市表现强势，但在“北京”（低温续航）和“成都”（充电设施）存在内容空白。建议针对北方城市增加“热泵空调”、“低温实测”类科普内容，针对西南地区发布“充电地图”攻略。
-                                </p>
-                                <p>
-                                    <span className="font-bold text-gray-800">3. 情绪修复与引导：</span>
-                                    关于“内饰异味”的负面讨论虽热度不高但影响决策，需通过KOC真实体验进行正面覆盖。对于“售后服务”的中立评价，可通过发布“服务升级计划”及车主关怀案例来提升好感度。
-                                </p>
+                        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                            <h4 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                                <Target className="w-4 h-4" />
+                                建议抢占的高热度意图词
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                                <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200 shadow-sm">
+                                    20万级纯电SUV性价比
+                                </span>
+                                <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200 shadow-sm">
+                                    800V高压快充车型
+                                </span>
+                                <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200 shadow-sm">
+                                    上海新能源牌照政策2025
+                                </span>
+                                <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200 shadow-sm">
+                                    高速NGP真实体验
+                                </span>
                             </div>
-                            <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
-                                <button className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-sm">
-                                    生成详细洞察报告
-                                </button>
-                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right: Strategy Analysis */}
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                        <h4 className="font-semibold text-gray-800 mb-3">综合策略分析</h4>
+                        <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
+                            <p>
+                                <span className="font-bold text-gray-800">1. 扬长避短，强化智驾标签：</span>
+                                当前品牌在“智能驾驶”相关问题中排名第一，应继续巩固。针对“续航里程”等竞品强势领域，建议避开直接参数对比，转而强调“扎实续航”和“充电速度”的差异化优势。
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-800">2. 地域精准渗透：</span>
+                                在“上海”、“深圳”等政策导向型城市表现强势，但在“北京”（低温续航）和“成都”（充电设施）存在内容空白。建议针对北方城市增加“热泵空调”、“低温实测”类科普内容，针对西南地区发布“充电地图”攻略。
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-800">3. 情绪修复与引导：</span>
+                                关于“内饰异味”的负面讨论虽热度不高但影响决策，需通过KOC真实体验进行正面覆盖。对于“售后服务”的中立评价，可通过发布“服务升级计划”及车主关怀案例来提升好感度。
+                            </p>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
+                            <button className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-sm">
+                                生成详细洞察报告
+                            </button>
                         </div>
                     </div>
                 </div>
