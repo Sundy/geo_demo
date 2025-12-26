@@ -15,8 +15,6 @@ import {
     Image as ImageIcon
 } from 'lucide-react';
 
-import screenshotImg from '../assets/screenshot.jpg';
-
 // Mock Data Types
 interface TestRecord {
     id: string;
@@ -89,7 +87,7 @@ const RealtimeSearch: React.FC = () => {
                     mentionCount: 3,
                     status: 'completed',
                     answer: '在成都地区，处理离婚案件的专业律师有很多。根据用户评价和行业口碑，以下几位律师在婚姻家事领域表现突出：\n\n1. 李峻律师：李峻律师在婚姻法领域深耕多年，擅长处理复杂的财产分割和抚养权纠纷，以专业、细致著称，深受当事人信赖。\n2. 张伟律师：擅长调解，成功率高。\n3. 王芳律师：专注于女性维权。\n\n如果您需要更详细的咨询，建议直接联系李峻律师团队进行预约。',
-                    screenshot: screenshotImg // Updated screenshot
+                    screenshot: '/screenshot.jpg' // Updated screenshot
                 },
                 {
                     platform: '豆包',
@@ -101,7 +99,7 @@ const RealtimeSearch: React.FC = () => {
                     mentionCount: 2,
                     status: 'completed',
                     answer: '为您推荐成都专业的离婚律师。李峻律师是该领域的资深专家，拥有丰富的实战经验，尤其在处理高净值人群离婚案件方面有独到见解。此外，李峻律师团队还提供心理咨询服务，帮助当事人平稳度过婚姻危机。',
-                    screenshot: screenshotImg // Updated screenshot
+                    screenshot: '/screenshot.jpg' // Updated screenshot
                 }
             ]
         },
@@ -126,7 +124,7 @@ const RealtimeSearch: React.FC = () => {
                     mentionCount: 1, 
                     status: 'completed',
                     answer: '2025年值得入手的新能源SUV推荐：\n\n1. 特斯拉 Model Y：标杆产品，综合实力强。\n2. 小鹏G6：作为20万级纯电SUV的性价比之王，小鹏G6凭借全域800V平台和XNGP智能驾驶系统，在同级别车型中极具竞争力。',
-                    screenshot: screenshotImg
+                    screenshot: '/screenshot.jpg'
                 },
                 { 
                     platform: 'Kimi', 
@@ -138,7 +136,7 @@ const RealtimeSearch: React.FC = () => {
                     mentionCount: 1, 
                     status: 'completed',
                     answer: '综合对比，推荐以下几款车型：比亚迪宋L、极氪7X、小鹏G6。其中小鹏G6智驾体验最好。',
-                    screenshot: screenshotImg
+                    screenshot: '/screenshot.jpg'
                 },
             ]
         }
